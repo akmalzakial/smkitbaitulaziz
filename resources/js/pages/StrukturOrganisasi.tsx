@@ -230,7 +230,7 @@ export default function StrukturOrganisasi({ struktur, teachers }: Props) {
             Jadilah bagian dari keluarga besar SMKIT Baitul Aziz
           </p>
           <a
-            href="/ppdb"
+            href="/spmb"
             className="inline-flex items-center gap-2 px-8 py-4 bg-white text-orange-600 rounded-xl font-semibold hover:bg-orange-50 transition-all duration-300 shadow-lg hover:shadow-xl"
           >
             Daftar Sekarang

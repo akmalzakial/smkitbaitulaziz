@@ -1,20 +1,12 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminLayout from '@/layouts/AdminLayout';
-import { 
-  Users, 
-  Plus, 
-  Search, 
-  Edit2, 
-  Trash2, 
-  Eye,
-  Filter,
-  UserCheck,
-  UserCog,
-  GraduationCap,
-  ChevronLeft,
-  ChevronRight
-} from 'lucide-react';
+import ArgonStatCard from '@/components/admin/ArgonStatCard';
+import ArgonCard from '@/components/admin/ArgonCard';
+import ArgonTable from '@/components/admin/ArgonTable';
+import ArgonBadge from '@/components/admin/ArgonBadge';
+import ArgonPagination from '@/components/admin/ArgonPagination';
+import ArgonFormInput from '@/components/admin/ArgonFormInput';
 
 interface Teacher {
   id: number;
@@ -90,93 +82,81 @@ export default function TeachersIndex({ teachers, filters, stats }: Props) {
     <AdminLayout>
       <Head title="Kelola Guru & Struktur" />
 
-      <div className="p-6 space-y-6">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-white">Kelola Guru & Struktur</h1>
-            <p className="text-white mt-1">Manajemen data guru dan struktur organisasi</p>
-          </div>
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-white mb-1">Kelola Guru & Struktur</h1>
+        <p className="text-white/80 text-sm">Manajemen data guru dan struktur organisasi SMK IT Baitul Aziz.</p>
+      </div>
+
+      {/* Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <ArgonStatCard
+          title="Total Data"
+          value={stats.total}
+          icon={<i className="ni ni-collection text-lg" />}
+          gradient="bg-gradient-to-tl from-blue-500 to-violet-500"
+          footer={<span className="text-slate-400 text-xs">Total Guru & Staff</span>}
+        />
+        <ArgonStatCard
+          title="Struktur Organisasi"
+          value={stats.struktur}
+          icon={<i className="ni ni-settings text-lg" />}
+          gradient="bg-gradient-to-tl from-purple-600 to-violet-500"
+          footer={<span className="text-slate-400 text-xs">Pengurus & Staff</span>}
+        />
+        <ArgonStatCard
+          title="Tenaga Pengajar"
+          value={stats.guru}
+          icon={<i className="ni ni-hat-3 text-lg" />}
+          gradient="bg-gradient-to-tl from-emerald-500 to-teal-400"
+          footer={<span className="text-slate-400 text-xs">Guru Bidang Studi</span>}
+        />
+        <ArgonStatCard
+          title="Status Aktif"
+          value={stats.active}
+          icon={<i className="ni ni-single-02 text-lg" />}
+          gradient="bg-gradient-to-tl from-orange-500 to-yellow-500"
+          footer={<span className="text-slate-400 text-xs">Pendidik Aktif</span>}
+        />
+      </div>
+
+      {/* Main card */}
+      <ArgonCard
+        title="Daftar Guru & Staff"
+        headerRight={
           <Link
             href="/admin/teachers/create"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-block px-4 py-2 bg-gradient-to-tl from-orange-500 to-yellow-500 text-white text-xs font-bold uppercase rounded-lg shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-px"
           >
-            <Plus className="w-5 h-5" />
-            Tambah Data
+            <i className="fas fa-plus mr-1.5" /> Tambah Data
           </Link>
-        </div>
-
-        {/* Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-blue-100 text-sm">Total Data</p>
-                <p className="text-3xl font-bold mt-1">{stats.total}</p>
-              </div>
-              <Users className="w-12 h-12 text-blue-200" />
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-100 text-sm">Struktur Organisasi</p>
-                <p className="text-3xl font-bold mt-1">{stats.struktur}</p>
-              </div>
-              <UserCog className="w-12 h-12 text-purple-200" />
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-green-100 text-sm">Guru</p>
-                <p className="text-3xl font-bold mt-1">{stats.guru}</p>
-              </div>
-              <GraduationCap className="w-12 h-12 text-green-200" />
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-orange-100 text-sm">Aktif</p>
-                <p className="text-3xl font-bold mt-1">{stats.active}</p>
-              </div>
-              <UserCheck className="w-12 h-12 text-orange-200" />
-            </div>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        }
+        noPadding
+      >
+        {/* Filters Form */}
+        <div className="p-6 pb-2">
           <form onSubmit={handleSearch} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Cari
-                </label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Cari nama, NIP, atau jabatan..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
+                <ArgonFormInput
+                  label="Cari Guru/Staff"
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Cari nama, NIP, atau jabatan..."
+                  icon="fas fa-search"
+                  wrapperClassName="mb-0"
+                />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs font-bold uppercase text-slate-400 mb-2">
                   Tipe
                 </label>
                 <select
                   value={type}
                   onChange={(e) => setType(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="text-sm w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-slate-700 focus:border-orange-500 focus:outline-none"
                 >
                   <option value="">Semua Tipe</option>
                   <option value="struktur">Struktur</option>
@@ -185,13 +165,13 @@ export default function TeachersIndex({ teachers, filters, stats }: Props) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs font-bold uppercase text-slate-400 mb-2">
                   Status
                 </label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="text-sm w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-slate-700 focus:border-orange-500 focus:outline-none"
                 >
                   <option value="">Semua Status</option>
                   <option value="active">Aktif</option>
@@ -203,15 +183,14 @@ export default function TeachersIndex({ teachers, filters, stats }: Props) {
             <div className="flex gap-2">
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center px-4 py-2 bg-gradient-to-tl from-orange-500 to-yellow-500 text-white text-xs font-bold uppercase rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer"
               >
-                <Filter className="w-4 h-4" />
-                Terapkan Filter
+                <i className="fas fa-filter mr-1.5" /> Terapkan Filter
               </button>
               <button
                 type="button"
                 onClick={resetFilters}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-xs font-bold uppercase text-slate-400 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg cursor-pointer transition-all duration-200"
               >
                 Reset
               </button>
@@ -219,183 +198,129 @@ export default function TeachersIndex({ teachers, filters, stats }: Props) {
           </form>
         </div>
 
-        {/* Table */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Foto
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Nama
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    NIP
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Jabatan
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Tipe
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Urutan
-                  </th>
-                  <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Aksi
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {teachers.data.length === 0 ? (
-                  <tr>
-                    <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
-                      <Users className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                      <p className="text-lg font-medium">Tidak ada data</p>
-                      <p className="text-sm">Silakan tambah data guru atau struktur organisasi</p>
-                    </td>
-                  </tr>
-                ) : (
-                  teachers.data.map((teacher) => (
-                    <tr key={teacher.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
-                          {teacher.photo_url ? (
-                            <img
-                              src={teacher.photo_url}
-                              alt={teacher.name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Users className="w-6 h-6 text-gray-400" />
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-gray-900">{teacher.name}</div>
-                        {teacher.email && (
-                          <div className="text-sm text-gray-500">{teacher.email}</div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {teacher.nip || '-'}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900">{teacher.position}</div>
-                        {teacher.subject && (
-                          <div className="text-xs text-gray-500">{teacher.subject}</div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            teacher.type === 'struktur'
-                              ? 'bg-purple-100 text-purple-700'
-                              : 'bg-green-100 text-green-700'
-                          }`}
-                        >
-                          {teacher.type === 'struktur' ? 'Struktur' : 'Guru'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            teacher.is_active
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-red-100 text-red-700'
-                          }`}
-                        >
-                          {teacher.is_active ? 'Aktif' : 'Nonaktif'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {teacher.order}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <Link
-                            href={`/admin/teachers/${teacher.id}/edit`}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Edit"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </Link>
-                          <button
-                            onClick={() => handleDelete(teacher)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Hapus"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+        {/* Table Layout */}
+        <ArgonTable
+          headers={[
+            'Foto',
+            'Nama',
+            'NIP',
+            'Jabatan',
+            { label: 'Tipe', align: 'left' },
+            { label: 'Status', align: 'left' },
+            'Urutan',
+            { label: 'Aksi', align: 'right' }
+          ]}
+        >
+          {teachers.data.length === 0 ? (
+            <tr>
+              <td colSpan={8} className="p-8 text-center text-slate-400 text-sm">
+                Tidak ada data guru atau staff yang ditemukan.
+              </td>
+            </tr>
+          ) : (
+            teachers.data.map((teacher) => (
+              <tr key={teacher.id}>
+                {/* Photo */}
+                <td className="p-2 px-6 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 shadow-sm border border-gray-100">
+                    {teacher.photo_url ? (
+                      <img
+                        src={teacher.photo_url}
+                        alt={teacher.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-slate-400">
+                        <i className="fas fa-user text-sm" />
+                      </div>
+                    )}
+                  </div>
+                </td>
 
-          {/* Pagination */}
-          {teachers.last_page > 1 && (
-            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-              <div className="text-sm text-gray-700">
-                Menampilkan <span className="font-medium">{teachers.data.length}</span> dari{' '}
-                <span className="font-medium">{teachers.total}</span> data
-              </div>
-              <div className="flex gap-2">
-                {teachers.links.map((link, index) => {
-                  if (link.label.includes('Previous')) {
-                    return (
-                      <button
-                        key={index}
-                        onClick={() => link.url && router.get(link.url)}
-                        disabled={!link.url}
-                        className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        <ChevronLeft className="w-5 h-5" />
-                      </button>
-                    );
-                  }
-                  if (link.label.includes('Next')) {
-                    return (
-                      <button
-                        key={index}
-                        onClick={() => link.url && router.get(link.url)}
-                        disabled={!link.url}
-                        className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        <ChevronRight className="w-5 h-5" />
-                      </button>
-                    );
-                  }
-                  return (
-                    <button
-                      key={index}
-                      onClick={() => link.url && router.get(link.url)}
-                      className={`px-4 py-2 rounded-lg transition-colors ${
-                        link.active
-                          ? 'bg-blue-600 text-white'
-                          : 'border border-gray-300 hover:bg-gray-50'
-                      }`}
+                {/* Name & Email */}
+                <td className="p-2 px-6 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                  <div className="flex flex-col justify-center">
+                    <h6 className="mb-0 text-sm font-semibold leading-normal text-slate-700">
+                      {teacher.name}
+                    </h6>
+                    {teacher.email && (
+                      <p className="mb-0 text-xs text-slate-400">{teacher.email}</p>
+                    )}
+                  </div>
+                </td>
+
+                {/* NIP */}
+                <td className="p-2 px-6 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                  <span className="text-xs font-semibold leading-tight text-slate-500">
+                    {teacher.nip || '-'}
+                  </span>
+                </td>
+
+                {/* Position / Subject */}
+                <td className="p-2 px-6 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                  <div className="flex flex-col justify-center">
+                    <span className="text-xs font-semibold leading-tight text-slate-700">{teacher.position}</span>
+                    {teacher.subject && (
+                      <span className="text-xxs text-slate-400">{teacher.subject}</span>
+                    )}
+                  </div>
+                </td>
+
+                {/* Type */}
+                <td className="p-2 px-6 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                  {teacher.type === 'struktur' ? (
+                    <ArgonBadge variant="purple">Struktur</ArgonBadge>
+                  ) : (
+                    <ArgonBadge variant="info">Guru</ArgonBadge>
+                  )}
+                </td>
+
+                {/* Status */}
+                <td className="p-2 px-6 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                  {teacher.is_active ? (
+                    <ArgonBadge variant="success" gradient>Aktif</ArgonBadge>
+                  ) : (
+                    <ArgonBadge variant="danger">Nonaktif</ArgonBadge>
+                  )}
+                </td>
+
+                {/* Order */}
+                <td className="p-2 px-6 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent text-xs font-semibold leading-tight text-slate-500">
+                  {teacher.order}
+                </td>
+
+                {/* Actions */}
+                <td className="p-2 px-6 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent text-right">
+                  <div className="flex items-center justify-end space-x-2">
+                    <Link
+                      href={`/admin/teachers/${teacher.id}/edit`}
+                      className="inline-flex items-center justify-center w-8 h-8 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 rounded-lg transition-colors"
+                      title="Edit"
                     >
-                      {link.label}
+                      <i className="fas fa-edit text-xs" />
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(teacher)}
+                      className="inline-flex items-center justify-center w-8 h-8 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-lg transition-colors cursor-pointer"
+                      title="Hapus"
+                    >
+                      <i className="fas fa-trash text-xs" />
                     </button>
-                  );
-                })}
-              </div>
-            </div>
+                  </div>
+                </td>
+              </tr>
+            ))
           )}
-        </div>
-      </div>
+        </ArgonTable>
+
+        {/* Pagination */}
+        <ArgonPagination
+          links={teachers.links}
+          from={teachers.data.length ? (teachers.current_page - 1) * teachers.per_page + 1 : 0}
+          to={teachers.data.length ? (teachers.current_page - 1) * teachers.per_page + teachers.data.length : 0}
+          total={teachers.total}
+        />
+      </ArgonCard>
     </AdminLayout>
   );
 }
-

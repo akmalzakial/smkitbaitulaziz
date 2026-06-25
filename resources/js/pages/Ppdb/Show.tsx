@@ -73,7 +73,7 @@ export default function PpdbShow({ ppdb, auth }) {
                     {getStatusBadge(ppdb.status)}
                     
                     <Link
-                      href={route('ppdb.print', ppdb.id)}
+                      href={route('spmb.print', ppdb.id)}
                       target="_blank"
                       className="px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg text-gray-700 text-sm font-medium transition-all duration-300 inline-flex items-center"
                     >
@@ -303,7 +303,7 @@ export default function PpdbShow({ ppdb, auth }) {
             
             <div className="mt-6 flex justify-center">
               <Link
-                href="/ppdb/status"
+                href="/spmb/status"
                 className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg text-gray-700 font-medium transition-all duration-300 flex items-center"
               >
                 Kembali ke Status Pendaftaran

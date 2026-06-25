@@ -1,9 +1,9 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AdminLayout from '@/layouts/AdminLayout';
-import { ArrowLeft, Edit, Calendar, User, Tag, Star } from 'lucide-react';
-import { motion } from 'framer-motion';
 import ImagePlaceholder from '@/components/ImagePlaceholder';
+import ArgonCard from '@/components/admin/ArgonCard';
+import ArgonBadge from '@/components/admin/ArgonBadge';
 
 interface User {
   id: number;
@@ -33,85 +33,102 @@ const Show: React.FC<Props> = ({ gallery }) => {
     <AdminLayout>
       <Head title={`${gallery.title} - Detail Galeri - SMK IT Baitul Aziz`} />
       
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
+      {/* Header and Back Link */}
+      <div className="mb-6">
+        <Link 
+          href="/admin/gallery" 
+          className="text-white hover:text-white/80 inline-flex items-center text-sm transition-colors mb-4"
+        >
+          <i className="fas fa-arrow-left mr-1.5" /> Kembali ke daftar galeri
+        </Link>
+
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-white mb-1">{gallery.title}</h1>
+            <p className="text-white/80 text-sm">Detail data foto galeri SMK IT Baitul Aziz.</p>
+          </div>
+          
           <Link 
-            href="/admin/gallery" 
-            className="text-blue-600 hover:text-blue-800 inline-flex items-center"
+            href={`/admin/gallery/${gallery.id}/edit`} 
+            className="inline-block px-4 py-2 bg-gradient-to-tl from-orange-500 to-yellow-500 text-white text-xs font-bold uppercase rounded-lg shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-px"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Kembali ke daftar galeri
+            <i className="fas fa-edit mr-1.5" /> Edit
           </Link>
         </div>
-        
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="p-6">
-            <div className="flex justify-between items-start mb-4">
-              <h1 className="text-2xl font-bold text-gray-800">{gallery.title}</h1>
-              <Link 
-                href={`/admin/gallery/${gallery.id}/edit`} 
-                className="bg-amber-500 hover:bg-amber-600 text-white py-2 px-4 rounded-lg inline-flex items-center transition-colors duration-300"
-              >
-                <Edit className="h-5 w-5 mr-2" />
-                Edit
-              </Link>
-            </div>
-            
-            <div className="flex flex-wrap gap-4 mb-6 text-sm text-gray-600">
-              {gallery.category && (
-                <div className="flex items-center">
-                  <Tag className="h-4 w-4 mr-1" />
-                  <span>Kategori: <span className="font-medium">{gallery.category}</span></span>
-                </div>
+      </div>
+      
+      <div className="max-w-4xl space-y-6">
+        <ArgonCard title="Detail Informasi Foto">
+          {/* Metadata Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6 pb-6 border-b border-gray-150">
+            <div>
+              <span className="block text-xs font-bold uppercase text-slate-400 mb-1">Kategori</span>
+              {gallery.category ? (
+                <ArgonBadge variant="info">{gallery.category}</ArgonBadge>
+              ) : (
+                <span className="text-sm font-semibold text-slate-500">-</span>
               )}
-              <div className="flex items-center">
-                <Calendar className="h-4 w-4 mr-1" />
-                <span>Ditambahkan: <span className="font-medium">
-                  {new Date(gallery.created_at).toLocaleDateString('id-ID', {
-                    day: 'numeric', month: 'long', year: 'numeric'
-                  })}
-                </span></span>
-              </div>
-              <div className="flex items-center">
-                <User className="h-4 w-4 mr-1" />
-                <span>Oleh: <span className="font-medium">{gallery.user.name}</span></span>
-              </div>
-              <div className="flex items-center">
-                <Star className="h-4 w-4 mr-1" />
-                <span>Unggulan: <span className="font-medium">{gallery.is_featured ? 'Ya' : 'Tidak'}</span></span>
-              </div>
             </div>
-            
-            <div className="aspect-video mb-6 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
-              {gallery.image ? (
-                <img 
-                  src={gallery.image} 
-                  alt={gallery.title}
-                  className="w-full h-full object-contain"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    e.currentTarget.nextElementSibling!.style.display = 'flex';
-                  }}
-                />
-              ) : null}
-              <ImagePlaceholder 
-                width="100%" 
-                height="100%" 
-                className={gallery.image ? 'hidden' : ''} 
-              />
+
+            <div>
+              <span className="block text-xs font-bold uppercase text-slate-400 mb-1">Ditambahkan Oleh</span>
+              <span className="text-sm font-semibold text-slate-700">
+                <i className="fas fa-user mr-1.5 text-slate-400" />
+                {gallery.user.name}
+              </span>
             </div>
-            
-            {gallery.description && (
-              <div className="prose max-w-none">
-                <h2 className="text-xl font-semibold mb-2">Deskripsi</h2>
-                <p className="text-gray-700">{gallery.description}</p>
-              </div>
-            )}
+
+            <div>
+              <span className="block text-xs font-bold uppercase text-slate-400 mb-1">Tanggal Upload</span>
+              <span className="text-sm font-semibold text-slate-700">
+                <i className="fas fa-calendar mr-1.5 text-slate-400" />
+                {new Date(gallery.created_at).toLocaleDateString('id-ID', {
+                  day: 'numeric', month: 'long', year: 'numeric'
+                })}
+              </span>
+            </div>
+
+            <div>
+              <span className="block text-xs font-bold uppercase text-slate-400 mb-1">Unggulan</span>
+              {gallery.is_featured ? (
+                <ArgonBadge variant="success" gradient>Ya</ArgonBadge>
+              ) : (
+                <ArgonBadge variant="default">Tidak</ArgonBadge>
+              )}
+            </div>
           </div>
-        </div>
+
+          {/* Photo Display */}
+          <div className="rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center p-4 border border-gray-100 max-h-[500px]">
+            {gallery.image ? (
+              <img 
+                src={gallery.image} 
+                alt={gallery.title}
+                className="w-full object-contain max-h-[460px] rounded-lg shadow-sm"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.nextElementSibling!.style.display = 'flex';
+                }}
+              />
+            ) : null}
+            <ImagePlaceholder 
+              width="100%" 
+              height="400px" 
+              className={gallery.image ? 'hidden' : ''} 
+            />
+          </div>
+          
+          {/* Description */}
+          {gallery.description && (
+            <div className="mt-6 pt-6 border-t border-gray-150">
+              <h6 className="text-slate-700 font-bold mb-2 text-sm">Deskripsi</h6>
+              <p className="text-slate-500 text-sm leading-relaxed">{gallery.description}</p>
+            </div>
+          )}
+        </ArgonCard>
       </div>
     </AdminLayout>
   );
 };
 
-export default Show; 
+export default Show;

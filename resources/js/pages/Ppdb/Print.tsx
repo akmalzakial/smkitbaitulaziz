@@ -20,7 +20,7 @@ export default function PpdbPrint({ auth, ppdb }: { auth: any, ppdb: any }) {
         <div className="max-w-lg mx-auto p-8 text-center">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Data Tidak Ditemukan</h2>
           <p className="text-gray-600 mb-8">
-            Data pendaftaran PPDB tidak ditemukan atau Anda tidak memiliki akses.
+            Data pendaftaran SPMB tidak ditemukan atau Anda tidak memiliki akses.
           </p>
           <button 
             onClick={() => window.history.back()}
@@ -39,7 +39,7 @@ export default function PpdbPrint({ auth, ppdb }: { auth: any, ppdb: any }) {
 
   return (
     <>
-      <Head title="Cetak Formulir Pendaftaran PPDB - SMK IT Baitul Aziz" />
+      <Head title="Cetak Formulir Pendaftaran SPMB - SMK IT Baitul Aziz" />
       
       <div className="print:p-0 p-8 bg-white text-black min-h-screen font-serif" ref={printRef}>
         {/* Hanya tampilkan tombol kembali saat mode preview (tidak print) */}

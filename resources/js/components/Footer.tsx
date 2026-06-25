@@ -1,9 +1,11 @@
 import React from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { Facebook, Twitter, Instagram, Mail, MapPin, Phone, Youtube } from 'lucide-react';
+import { type SharedData } from '@/types';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
+  const { contact_settings } = usePage<SharedData>().props;
 
   return (
     <footer className="bg-gray-100 relative pt-16 pb-8 overflow-hidden">
@@ -34,15 +36,21 @@ const Footer: React.FC = () => {
             <p className="text-gray-600 mb-6">
             Membentuk Generasi Unggul yang Berakhlak Mulia dan Terampil di Bidang Teknologi Informasi            </p>
             <div className="flex space-x-4">
-              <a href="https://facebook.com/baitulaziz.indonesia/" className="text-gray-500 hover:text-orange-500 transition-colors">
-                <Facebook size={20} />
-              </a>
-              <a href="https://www.youtube.com/channel/UCmhFZ8RI85ZTVAQTDW2TFtg" className="text-gray-500 hover:text-orange-500 transition-colors">
-                <Youtube size={20} />
-              </a>
-              <a href="https://www.instagram.com/baitulaziz.id" className="text-gray-500 hover:text-orange-500 transition-colors">
-                <Instagram size={20} />
-              </a>
+              {contact_settings?.facebook_url && (
+                <a href={contact_settings.facebook_url} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-orange-500 transition-colors">
+                  <Facebook size={20} />
+                </a>
+              )}
+              {contact_settings?.youtube_url && (
+                <a href={contact_settings.youtube_url} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-orange-500 transition-colors">
+                  <Youtube size={20} />
+                </a>
+              )}
+              {contact_settings?.instagram_url && (
+                <a href={contact_settings.instagram_url} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-orange-500 transition-colors">
+                  <Instagram size={20} />
+                </a>
+              )}
             </div>
           </div>
 
@@ -97,15 +105,21 @@ const Footer: React.FC = () => {
             <ul className="space-y-4">
               <li className="flex items-start">
                 <MapPin className="text-orange-500 mt-1 mr-3 shrink-0" size={18} />
-                <span className="text-gray-600">Jl. Contoh No. 123, Kecamatan, Kota, Provinsi, Indonesia</span>
+                <span className="text-gray-600">
+                  {contact_settings?.address || 'Jl. Baitul Aziz, Solokan Jeruk, Kec. Solokanjeruk, Kabupaten Bandung, Jawa Barat 40376'}
+                </span>
               </li>
               <li className="flex items-center">
                 <Phone className="text-orange-500 mr-3 shrink-0" size={18} />
-                <span className="text-gray-600">(021) 1234-5678</span>
+                <span className="text-gray-600">
+                  {contact_settings?.phone || '(022) 8596 3085'}
+                </span>
               </li>
               <li className="flex items-center">
                 <Mail className="text-orange-500 mr-3 shrink-0" size={18} />
-                <span className="text-gray-600">info@smkitbaitulaziz.sch.id</span>
+                <span className="text-gray-600">
+                  {contact_settings?.email || 'info@smkitbaitulaziz.sch.id'}
+                </span>
               </li>
             </ul>
           </div>

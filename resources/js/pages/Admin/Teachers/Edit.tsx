@@ -1,7 +1,8 @@
 import React, { useState, FormEvent, ChangeEvent } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminLayout from '@/layouts/AdminLayout';
-import { ArrowLeft, Upload, X } from 'lucide-react';
+import ArgonCard from '@/components/admin/ArgonCard';
+import ArgonFormInput from '@/components/admin/ArgonFormInput';
 
 interface Teacher {
   id: number;
@@ -105,240 +106,243 @@ export default function TeachersEdit({ teacher }: Props) {
     <AdminLayout>
       <Head title="Edit Guru/Struktur" />
 
-      <div className="p-6 max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <Link
-            href="/admin/teachers"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Kembali
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Edit Data</h1>
-          <p className="text-gray-600 mt-1">Ubah data guru atau struktur organisasi</p>
-        </div>
+      {/* Header and Back Link */}
+      <div className="mb-6">
+        <Link
+          href="/admin/teachers"
+          className="text-white hover:text-white/80 inline-flex items-center text-sm transition-colors"
+        >
+          <i className="fas fa-arrow-left mr-1.5" /> Kembali ke Daftar Guru
+        </Link>
+        <h1 className="text-2xl font-bold text-white mt-2">Edit Data Guru / Staff</h1>
+      </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-6">
-          {/* Photo Upload */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Foto
-            </label>
-            {photoPreview ? (
-              <div className="relative inline-block">
-                <img
-                  src={photoPreview}
-                  alt="Preview"
-                  className="w-32 h-32 rounded-lg object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={removePhoto}
-                  className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+      <div className="max-w-3xl">
+        <form onSubmit={handleSubmit}>
+          <ArgonCard 
+            title="Form Edit Guru & Staff"
+            footer={
+              <div className="flex items-center justify-end space-x-3 w-full">
+                <Link
+                  href="/admin/teachers"
+                  className="px-4 py-2 text-xs font-bold uppercase text-slate-400 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg cursor-pointer transition-all duration-200"
                 >
-                  <X className="w-4 h-4" />
+                  Batal
+                </Link>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="inline-flex items-center px-4 py-2 bg-gradient-to-tl from-orange-500 to-yellow-500 text-white text-xs font-bold uppercase rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <i className="fas fa-spinner animate-spin mr-1.5" />
+                      Menyimpan...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-save mr-1.5" />
+                      Simpan Perubahan
+                    </>
+                  )}
                 </button>
               </div>
-            ) : (
-              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
-                <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                <p className="text-sm text-gray-500">Klik untuk upload foto</p>
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/jpg"
-                  onChange={handlePhotoChange}
-                  className="hidden"
-                />
+            }
+          >
+            {/* Photo Upload */}
+            <div className="mb-6">
+              <label className="block text-xs font-bold uppercase text-slate-400 mb-2">
+                Foto
               </label>
-            )}
-            {errors.photo && <p className="mt-1 text-sm text-red-600">{errors.photo}</p>}
-          </div>
+              {photoPreview ? (
+                <div className="relative inline-block group">
+                  <div className="relative rounded-xl overflow-hidden shadow-md ring-2 ring-orange-500/20">
+                    <img
+                      src={photoPreview}
+                      alt="Preview"
+                      className="w-32 h-32 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <button
+                        type="button"
+                        onClick={removePhoto}
+                        className="bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-transform transform hover:scale-105 cursor-pointer"
+                        title="Hapus foto"
+                      >
+                        <i className="fas fa-times text-xs" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <label className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex justify-center items-center flex-col cursor-pointer hover:border-orange-500 hover:bg-orange-500/5 transition-all duration-300 group bg-white max-w-sm">
+                  <div className="p-3 rounded-full bg-orange-500/10 group-hover:bg-orange-500/20 transition-colors mb-3">
+                    <i className="fas fa-upload text-orange-500 text-lg" />
+                  </div>
+                  <p className="text-sm font-semibold text-slate-700 group-hover:text-orange-500 transition-colors text-center">
+                    Klik untuk unggah foto baru
+                  </p>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/jpg"
+                    onChange={handlePhotoChange}
+                    className="hidden"
+                  />
+                </label>
+              )}
+              {errors.photo && <p className="mt-2 text-xs text-red-500 font-semibold">{errors.photo}</p>}
+            </div>
 
-          {/* Type */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tipe <span className="text-red-500">*</span>
-            </label>
-            <select
-              name="type"
-              value={formData.type}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            >
-              <option value="guru">Guru</option>
-              <option value="struktur">Struktur Organisasi</option>
-            </select>
-            {errors.type && <p className="mt-1 text-sm text-red-600">{errors.type}</p>}
-          </div>
+            {/* Type */}
+            <div className="mb-4">
+              <label className="block text-xs font-bold uppercase text-slate-400 mb-2">
+                Tipe *
+              </label>
+              <div className="relative flex flex-wrap items-stretch w-full transition-all rounded-lg ease">
+                <span className="text-sm ease absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-3 text-center font-normal text-slate-500 transition-all leading-5">
+                  <i className="fas fa-user-tag" />
+                </span>
+                <select
+                  name="type"
+                  value={formData.type}
+                  onChange={handleInputChange}
+                  className="text-sm w-full rounded-lg border border-solid border-gray-300 bg-white py-2 pr-3 pl-9 text-slate-700 focus:border-orange-500 focus:outline-none focus:shadow-primary-outline transition-all"
+                  required
+                >
+                  <option value="guru">Guru</option>
+                  <option value="struktur">Struktur Organisasi</option>
+                </select>
+              </div>
+              {errors.type && <p className="mt-2 text-xs text-red-500 font-semibold">{errors.type}</p>}
+            </div>
 
-          {/* Name */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Nama Lengkap <span className="text-red-500">*</span>
-            </label>
-            <input
+            {/* Name */}
+            <ArgonFormInput
+              label="Nama Lengkap *"
               type="text"
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              error={errors.name}
+              placeholder="Masukkan nama lengkap beserta gelar"
+              icon="fas fa-user"
               required
             />
-            {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
-          </div>
 
-          {/* NIP */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              NIP/NUPTK
-            </label>
-            <input
+            {/* NIP */}
+            <ArgonFormInput
+              label="NIP / NUPTK"
               type="text"
               name="nip"
               value={formData.nip}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              error={errors.nip}
+              placeholder="Masukkan NIP jika ada"
+              icon="fas fa-id-card"
             />
-            {errors.nip && <p className="mt-1 text-sm text-red-600">{errors.nip}</p>}
-          </div>
 
-          {/* Position */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Jabatan <span className="text-red-500">*</span>
-            </label>
-            <input
+            {/* Position */}
+            <ArgonFormInput
+              label="Jabatan *"
               type="text"
               name="position"
               value={formData.position}
               onChange={handleInputChange}
-              placeholder="Contoh: Kepala Sekolah, Wakil Kepala Sekolah, Guru Matematika"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              error={errors.position}
+              placeholder="Contoh: Kepala Sekolah, Guru Matematika"
+              icon="fas fa-briefcase"
               required
             />
-            {errors.position && <p className="mt-1 text-sm text-red-600">{errors.position}</p>}
-          </div>
 
-          {/* Subject */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Mata Pelajaran
-            </label>
-            <input
+            {/* Subject */}
+            <ArgonFormInput
+              label="Mata Pelajaran"
               type="text"
               name="subject"
               value={formData.subject}
               onChange={handleInputChange}
+              error={errors.subject}
               placeholder="Untuk guru, isi mata pelajaran yang diampu"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              icon="fas fa-book"
             />
-            {errors.subject && <p className="mt-1 text-sm text-red-600">{errors.subject}</p>}
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email
-              </label>
-              <input
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+              {/* Email */}
+              <ArgonFormInput
+                label="Email"
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                error={errors.email}
+                placeholder="contoh@email.com"
+                icon="fas fa-envelope"
+                wrapperClassName="mb-0"
               />
-              {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
-            </div>
 
-            {/* Phone */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                No. Telepon
-              </label>
-              <input
+              {/* Phone */}
+              <ArgonFormInput
+                label="No. Telepon"
                 type="tel"
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                error={errors.phone}
+                placeholder="08xxxxxxxxxx"
+                icon="fas fa-phone"
+                wrapperClassName="mb-0"
               />
-              {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
             </div>
-          </div>
 
-          {/* Education */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Pendidikan Terakhir
-            </label>
-            <textarea
-              name="education"
-              value={formData.education}
-              onChange={handleInputChange}
-              rows={3}
-              placeholder="Contoh: S1 Pendidikan Matematika - Universitas Negeri Jakarta"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            {errors.education && <p className="mt-1 text-sm text-red-600">{errors.education}</p>}
-          </div>
+            {/* Education */}
+            <div className="mb-4">
+              <label htmlFor="education" className="block text-xs font-bold uppercase text-slate-400 mb-2">
+                Pendidikan Terakhir
+              </label>
+              <textarea
+                name="education"
+                value={formData.education}
+                onChange={handleInputChange}
+                rows={3}
+                placeholder="Contoh: S1 Pendidikan Matematika - Universitas Negeri Jakarta"
+                className="text-sm w-full rounded-lg border border-solid border-gray-300 bg-white py-2 px-3 text-slate-700 focus:border-orange-500 focus:outline-none focus:shadow-primary-outline transition-all"
+              />
+              {errors.education && <p className="mt-2 text-xs text-red-500 font-semibold">{errors.education}</p>}
+            </div>
 
-          {/* Order */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Urutan Tampilan <span className="text-red-500">*</span>
-            </label>
-            <input
+            {/* Order */}
+            <ArgonFormInput
+              label="Urutan Tampilan *"
               type="number"
               name="order"
               value={formData.order}
               onChange={handleInputChange}
+              error={errors.order}
               min="0"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              icon="fas fa-sort-numeric-down"
               required
             />
-            <p className="mt-1 text-xs text-gray-500">
-              Angka lebih kecil akan ditampilkan lebih dulu
+            <p className="mt-1 ml-1 text-xxs text-slate-400 -mt-3 mb-4">
+              Angka lebih kecil akan ditampilkan lebih dahulu
             </p>
-            {errors.order && <p className="mt-1 text-sm text-red-600">{errors.order}</p>}
-          </div>
 
-          {/* Is Active */}
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="is_active"
-              checked={formData.is_active}
-              onChange={handleInputChange}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label className="text-sm font-medium text-gray-700">
-              Aktif (tampilkan di halaman publik)
-            </label>
-          </div>
-
-          {/* Submit Buttons */}
-          <div className="flex items-center gap-4 pt-4 border-t">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-            >
-              {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
-            </button>
-            <Link
-              href="/admin/teachers"
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Batal
-            </Link>
-          </div>
+            {/* Is Active */}
+            <div className="flex items-center gap-2 mb-4">
+              <input
+                type="checkbox"
+                id="is_active"
+                name="is_active"
+                checked={formData.is_active}
+                onChange={handleInputChange}
+                className="h-5 w-5 text-orange-500 focus:ring-orange-500 border-gray-300 rounded cursor-pointer accent-orange-500"
+              />
+              <label htmlFor="is_active" className="text-xs font-bold text-slate-700 cursor-pointer select-none">
+                Aktif (tampilkan di halaman publik)
+              </label>
+            </div>
+          </ArgonCard>
         </form>
       </div>
     </AdminLayout>
   );
 }
-

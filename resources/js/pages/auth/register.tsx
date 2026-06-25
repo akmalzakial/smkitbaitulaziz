@@ -39,7 +39,7 @@ export default function Register() {
                 <div className="flex flex-col items-center mb-8">
                     <img src="/assets/images/logo.png" alt="SMK IT Baitul Aziz" className="h-28 w-auto mb-4" />
                     <h1 className="text-2xl font-bold">Daftar <span className="text-orange-500">Akun</span></h1>
-                    <p className="text-zinc-400 text-sm mt-2 text-center">Lengkapi data berikut untuk membuat akun baru dan melakukan pendaftaran PPDB</p>
+                    <p className="text-zinc-400 text-sm mt-2 text-center">Lengkapi data berikut untuk membuat akun baru dan melakukan pendaftaran SPMB</p>
                 </div>
                 
                 <form className="flex flex-col gap-6" onSubmit={submit}>

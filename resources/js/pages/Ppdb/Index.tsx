@@ -65,7 +65,7 @@ export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbI
 
   return (
     <>
-      <Head title="PPDB SMK IT Baitul Aziz" />
+      <Head title="SPMB SMK IT Baitul Aziz" />
 
       <div className="min-h-screen bg-white text-gray-800">
         <Navbar />
@@ -111,9 +111,9 @@ export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbI
                       <XCircle className="w-6 h-6 text-red-500" />
                     </div>
                     <div className="text-left">
-                      <h3 className="font-semibold text-red-800 mb-2">Pendaftaran PPDB Ditutup</h3>
+                      <h3 className="font-semibold text-red-800 mb-2">Pendaftaran SPMB Ditutup</h3>
                       <p className="text-red-700 text-sm">
-                        {ppdbSettings?.messageClosed || 'Pendaftaran PPDB saat ini sedang ditutup. Silakan hubungi pihak sekolah untuk informasi lebih lanjut.'}
+                        {ppdbSettings?.messageClosed || 'Pendaftaran SPMB saat ini sedang ditutup. Silakan hubungi pihak sekolah untuk informasi lebih lanjut.'}
                       </p>
                       {(ppdbSettings?.openDate || ppdbSettings?.closeDate) && (
                         <div className="mt-3 text-xs text-red-600">
@@ -130,14 +130,14 @@ export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbI
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 {hasRegistered ? (
                   <Link
-                    href="/ppdb/status"
+                    href="/spmb/status"
                     className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300 w-full sm:w-auto text-center"
                   >
                     Cek Status Pendaftaran
                   </Link>
                 ) : isOpen ? (
                   <Link
-                    href="/ppdb/pendaftaran"
+                    href="/spmb/pendaftaran"
                     className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300 w-full sm:w-auto text-center"
                   >
                     Daftar Sekarang
@@ -162,7 +162,7 @@ export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbI
           <div className="container mx-auto px-6 relative">
             <div className="max-w-3xl mx-auto text-center mb-16">
               <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                Informasi <span className="text-orange-500">PPDB</span>
+                Informasi <span className="text-orange-500">SPMB</span>
               </h2>
               <p className="text-gray-600">
                 Berikut adalah informasi penting terkait Penerimaan Peserta Didik Baru SMK IT Baitul Aziz tahun ajaran 2025/2026
@@ -318,7 +318,7 @@ export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbI
           <div className="container mx-auto px-6 relative">
             <div className="max-w-3xl mx-auto text-center mb-16">
               <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                Jadwal <span className="text-orange-500">PPDB</span>
+                Jadwal <span className="text-orange-500">SPMB</span>
               </h2>
               <p className="text-gray-600">
                 Berikut adalah jadwal penting terkait Penerimaan Peserta Didik Baru SMK IT Baitul Aziz tahun ajaran 2025/2026
@@ -365,7 +365,7 @@ export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbI
                 Hubungi <span className="text-orange-500">Kami</span>
               </h2>
               <p className="text-gray-600">
-                Untuk informasi lebih lanjut tentang PPDB SMK IT Baitul Aziz
+                Untuk informasi lebih lanjut tentang SPMB SMK IT Baitul Aziz
               </p>
             </div>
 
@@ -436,14 +436,14 @@ export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbI
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 {hasRegistered ? (
                   <Link
-                    href="/ppdb/status"
+                    href="/spmb/status"
                     className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300"
                   >
                     Cek Status Pendaftaran
                   </Link>
                 ) : isOpen ? (
                   <Link
-                    href="/ppdb/pendaftaran"
+                    href="/spmb/pendaftaran"
                     className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300"
                   >
                     Daftar Sekarang

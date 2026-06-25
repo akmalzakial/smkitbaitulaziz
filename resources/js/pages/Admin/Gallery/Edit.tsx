@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, Upload, X } from 'lucide-react';
-import AdminLayout from '../../../layouts/AdminLayout';
+import AdminLayout from '@/layouts/AdminLayout';
+import ArgonCard from '@/components/admin/ArgonCard';
+import ArgonFormInput from '@/components/admin/ArgonFormInput';
 
 interface Gallery {
   id: number;
@@ -64,7 +65,6 @@ const Edit: React.FC<Props> = ({ gallery }) => {
         fileInputRef.current.value = '';
       }
     } else {
-      // Jika belum ada perubahan, tetap tunjukkan form unggah
       setImagePreview(null);
     }
   };
@@ -115,7 +115,6 @@ const Edit: React.FC<Props> = ({ gallery }) => {
     
     router.post(`/admin/gallery/${gallery.id}`, formData, {
       onSuccess: () => {
-        // Navigasi ke halaman daftar galeri jika berhasil
         router.visit('/admin/gallery');
       },
       onError: (errors) => {
@@ -132,167 +131,190 @@ const Edit: React.FC<Props> = ({ gallery }) => {
     <AdminLayout>
       <Head title="Edit Galeri - SMK IT Baitul Aziz" />
       
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <Link 
-            href="/admin/gallery" 
-            className="text-blue-600 hover:text-blue-800 inline-flex items-center"
+      {/* Header and Back Link */}
+      <div className="mb-6">
+        <Link 
+          href="/admin/gallery" 
+          className="text-white hover:text-white/80 inline-flex items-center text-sm transition-colors"
+        >
+          <i className="fas fa-arrow-left mr-1.5" /> Kembali ke Daftar Galeri
+        </Link>
+        <h1 className="text-2xl font-bold text-white mt-2">Edit Foto Galeri</h1>
+      </div>
+      
+      <div className="max-w-3xl">
+        <form onSubmit={handleSubmit}>
+          <ArgonCard 
+            title="Form Edit Foto"
+            footer={
+              <div className="flex items-center justify-end space-x-3 w-full">
+                <Link
+                  href="/admin/gallery"
+                  className="px-4 py-2 text-xs font-bold uppercase text-slate-400 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg cursor-pointer transition-all duration-200"
+                >
+                  Batal
+                </Link>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="inline-flex items-center px-4 py-2 bg-gradient-to-tl from-orange-500 to-yellow-500 text-white text-xs font-bold uppercase rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <i className="fas fa-spinner animate-spin mr-1.5" />
+                      Menyimpan...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-save mr-1.5" />
+                      Simpan Perubahan
+                    </>
+                  )}
+                </button>
+              </div>
+            }
           >
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Kembali ke Daftar Galeri
-          </Link>
-          <h1 className="text-2xl font-bold text-gray-800 mt-2">Edit Foto Galeri</h1>
-        </div>
-        
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 gap-6 mb-6">
-              {/* Gambar Saat Ini / Unggah Gambar Baru */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Foto
-                </label>
-                {!imagePreview ? (
-                  <div 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="mt-1 border-2 border-dashed border-gray-300 rounded-lg p-6 flex justify-center items-center flex-col cursor-pointer hover:border-blue-500 transition-colors"
-                  >
-                    <Upload className="h-12 w-12 text-gray-400" />
-                    <p className="mt-2 text-sm text-gray-500">
-                      Klik untuk mengunggah foto baru
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      JPG, PNG, atau WebP (maks. 2MB)
-                    </p>
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      className="hidden"
-                      onChange={handleImageChange}
-                      accept="image/jpeg,image/png,image/jpg,image/webp"
-                      title="Unggah foto baru"
-                    />
+            {/* Foto */}
+            <div className="mb-6">
+              <label className="block text-xs font-bold uppercase text-slate-400 mb-2">
+                Foto
+              </label>
+              {!imagePreview ? (
+                <div 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="mt-1 border-2 border-dashed border-gray-300 rounded-xl p-10 flex justify-center items-center flex-col cursor-pointer hover:border-orange-500 hover:bg-orange-500/5 transition-all duration-300 group"
+                >
+                  <div className="p-4 rounded-full bg-orange-500/10 group-hover:bg-orange-500/20 transition-colors mb-3">
+                    <i className="fas fa-upload text-orange-500 text-xl" />
                   </div>
-                ) : (
-                  <div className="mt-1 relative">
-                    <div className="relative rounded-lg overflow-hidden">
-                      <img 
-                        src={imagePreview} 
-                        alt="Preview" 
-                        className="w-full h-64 object-cover"
-                      />
+                  <p className="mt-2 text-sm font-semibold text-slate-700 group-hover:text-orange-500 transition-colors">
+                    Klik untuk mengunggah foto baru
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">
+                    JPG, PNG, atau WebP (maks. 2MB)
+                  </p>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    onChange={handleImageChange}
+                    accept="image/jpeg,image/png,image/jpg,image/webp"
+                    title="Unggah foto baru"
+                  />
+                </div>
+              ) : (
+                <div className="mt-1 relative group">
+                  <div className="relative rounded-xl overflow-hidden shadow-md ring-2 ring-orange-500/20 max-w-md mx-auto">
+                    <img 
+                      src={imagePreview} 
+                      alt="Preview" 
+                      className="w-full h-64 object-cover"
+                    />
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 flex justify-end">
                       <button
                         type="button"
                         onClick={removeImage}
-                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+                        className="bg-red-600 hover:bg-red-700 text-white p-2 px-3 rounded-lg shadow-lg transition-transform transform hover:scale-105 flex items-center gap-2 text-xs font-semibold cursor-pointer"
                         title="Hapus gambar"
                       >
-                        <X className="h-5 w-5" />
+                        <i className="fas fa-times text-xs" />
+                        {imageChanged ? 'Batal' : 'Ganti Foto'}
                       </button>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {imageChanged 
-                        ? 'Klik tombol silang untuk kembali ke foto asli' 
-                        : 'Klik tombol silang untuk mengubah foto'}
-                    </p>
                   </div>
-                )}
-                {errors.image && (
-                  <p className="mt-1 text-sm text-red-600">{errors.image}</p>
-                )}
-              </div>
-              
-              {/* Judul */}
-              <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                  Judul <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${errors.title ? 'border-red-300' : ''}`}
-                  placeholder="Masukkan judul foto"
-                />
-                {errors.title && (
-                  <p className="mt-1 text-sm text-red-600">{errors.title}</p>
-                )}
-              </div>
-              
-              {/* Deskripsi */}
-              <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                  Deskripsi <span className="text-gray-400">(opsional)</span>
-                </label>
-                <textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={3}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                  placeholder="Masukkan deskripsi foto"
-                />
-              </div>
-              
+                  <p className="text-xs text-slate-400 mt-2 text-center">
+                    {imageChanged 
+                      ? 'Klik tombol Batal untuk kembali ke foto asli' 
+                      : 'Klik tombol Ganti Foto untuk mengubah foto'}
+                  </p>
+                </div>
+              )}
+              {errors.image && (
+                <p className="mt-2 text-xs text-red-500 font-semibold flex items-center">
+                  <span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>
+                  {errors.image}
+                </p>
+              )}
+            </div>
+            
+            {/* Judul */}
+            <ArgonFormInput
+              label="Judul *"
+              type="text"
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              error={errors.title}
+              placeholder="Masukkan judul foto"
+              icon="fas fa-heading"
+              required
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
               {/* Kategori */}
               <div>
-                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                  Kategori <span className="text-gray-400">(opsional)</span>
+                <label htmlFor="category" className="block text-xs font-bold uppercase text-slate-400 mb-2">
+                  Kategori <span className="text-slate-300 font-normal">(opsional)</span>
                 </label>
-                <select
-                  id="category"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                >
-                  <option value="">-- Pilih Kategori --</option>
-                  {availableCategories.map((cat, index) => (
-                    <option key={index} value={cat}>{cat}</option>
-                  ))}
-                </select>
+                <div className="relative flex flex-wrap items-stretch w-full transition-all rounded-lg ease">
+                  <span className="text-sm ease absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-3 text-center font-normal text-slate-500 transition-all leading-5">
+                    <i className="fas fa-folder" />
+                  </span>
+                  <select
+                    id="category"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="text-sm w-full rounded-lg border border-solid border-gray-300 bg-white py-2 pr-3 pl-9 text-slate-700 focus:border-orange-500 focus:outline-none focus:shadow-primary-outline transition-all"
+                  >
+                    <option value="">-- Pilih Kategori --</option>
+                    {availableCategories.map((cat, index) => (
+                      <option key={index} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              
+
               {/* Unggulan */}
-              <div>
-                <div className="flex items-center">
+              <div className="flex items-start pt-7">
+                <div className="flex items-center h-5">
                   <input
                     id="is_featured"
                     type="checkbox"
                     checked={isFeatured}
                     onChange={(e) => setIsFeatured(e.target.checked)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-5 w-5 text-orange-500 focus:ring-orange-500 border-gray-300 rounded cursor-pointer accent-orange-500"
                   />
-                  <label htmlFor="is_featured" className="ml-2 block text-sm text-gray-700">
-                    Jadikan sebagai foto unggulan
-                  </label>
                 </div>
-                <p className="mt-1 text-xs text-gray-500">
-                  Foto unggulan akan ditampilkan di bagian beranda website
-                </p>
+                <div className="ml-3 text-xs">
+                  <label htmlFor="is_featured" className="font-bold text-slate-700 select-none cursor-pointer">
+                    Jadikan Foto Unggulan
+                  </label>
+                  <p className="text-slate-400 mt-0.5">
+                    Foto akan ditampilkan di halaman depan website sekolah
+                  </p>
+                </div>
               </div>
             </div>
             
-            <div className="flex justify-end space-x-3">
-              <Link
-                href="/admin/gallery"
-                className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                Batal
-              </Link>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''}`}
-              >
-                {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
-              </button>
+            {/* Deskripsi */}
+            <div className="mb-4">
+              <label htmlFor="description" className="block text-xs font-bold uppercase text-slate-400 mb-2">
+                Deskripsi <span className="text-slate-300 font-normal">(opsional)</span>
+              </label>
+              <textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={4}
+                className="text-sm w-full rounded-lg border border-solid border-gray-300 bg-white py-2 px-3 text-slate-700 focus:border-orange-500 focus:outline-none focus:shadow-primary-outline transition-all"
+                placeholder="Masukkan deskripsi foto"
+              />
             </div>
-          </form>
-        </div>
+          </ArgonCard>
+        </form>
       </div>
     </AdminLayout>
   );
 };
 
-export default Edit; 
+export default Edit;

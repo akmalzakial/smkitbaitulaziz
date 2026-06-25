@@ -48,7 +48,7 @@ class PpdbController extends Controller
         // Cek apakah PPDB sedang dibuka
         $ppdbSettings = PpdbSetting::current();
         if (!$ppdbSettings || !$ppdbSettings->isCurrentlyOpen()) {
-            return redirect()->route('ppdb.index')
+            return redirect()->route('spmb.index')
                 ->with('error', 'Pendaftaran PPDB saat ini sedang ditutup.');
         }
         
@@ -60,7 +60,7 @@ class PpdbController extends Controller
         // Cek apakah user sudah pernah mendaftar
         $existingApplication = Ppdb::where('user_id', Auth::id())->first();
         if ($existingApplication) {
-            return redirect()->route('ppdb.show', $existingApplication->id)
+            return redirect()->route('spmb.show', $existingApplication->id)
                 ->with('message', 'Anda telah memiliki pendaftaran aktif');
         }
         
@@ -208,11 +208,11 @@ class PpdbController extends Controller
                         'success' => true,
                         'message' => 'Pendaftaran berhasil!',
                         'nomor_pendaftaran' => $ppdb->nomor_pendaftaran,
-                        'redirect' => route('ppdb.status')
+                        'redirect' => route('spmb.status')
                     ]);
                 }
 
-                return redirect()->route('ppdb.show', $ppdb->id)
+                return redirect()->route('spmb.show', $ppdb->id)
                     ->with('success', 'Pendaftaran berhasil! Nomor pendaftaran Anda adalah ' . $ppdb->nomor_pendaftaran . '. Data Anda akan diverifikasi oleh admin dan hasilnya dapat dilihat di halaman status pendaftaran.');
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::error('Database Save Error: ' . $e->getMessage());
@@ -533,11 +533,11 @@ class PpdbController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'Data pendaftaran berhasil diperbarui!',
-                    'redirect' => route('ppdb.show', $ppdb->id)
+                    'redirect' => route('spmb.show', $ppdb->id)
                 ]);
             }
             
-            return redirect()->route('ppdb.show', $ppdb->id)
+            return redirect()->route('spmb.show', $ppdb->id)
                     ->with('success', 'Data pendaftaran berhasil diperbarui!');
                 
         } catch (\Illuminate\Validation\ValidationException $e) {

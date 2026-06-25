@@ -43,19 +43,19 @@ export default function PpdbPrint({ auth, ppdb }: { auth: any, ppdb: any }) {
       
       <div className="print:p-0 p-8 bg-white text-black min-h-screen font-serif" ref={printRef}>
         {/* Hanya tampilkan tombol kembali saat mode preview (tidak print) */}
-        <div className="mb-8 print:hidden">
+        <div className="mb-8 print:hidden flex gap-2">
           <button 
             onClick={() => window.history.back()}
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-800 text-sm font-medium transition-all duration-300 mr-4"
+            className="inline-block px-4 py-2 bg-white text-slate-700 text-xs font-bold uppercase rounded-lg shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-px border border-gray-200"
           >
-            Kembali
+            <i className="fas fa-arrow-left mr-1 text-orange-500" /> Kembali
           </button>
           
           <button 
             onClick={() => window.print()}
-            className="px-4 py-2 bg-orange-500 hover:bg-orange-600 rounded-lg text-white text-sm font-medium transition-all duration-300"
+            className="inline-block px-4 py-2 bg-gradient-to-tl from-orange-500 to-yellow-500 text-white text-xs font-bold uppercase rounded-lg shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-px"
           >
-            Cetak Formulir
+            <i className="fas fa-print mr-1" /> Cetak Formulir
           </button>
         </div>
         

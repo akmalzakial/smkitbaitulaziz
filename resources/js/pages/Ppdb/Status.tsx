@@ -24,7 +24,7 @@ export default function PpdbStatus({ auth, applications = [] }) {
             </div>
             <h2 className="text-2xl font-bold text-center mb-4">Login Diperlukan</h2>
             <p className="text-gray-600 text-center mb-8">
-              Untuk melihat status pendaftaran PPDB, Anda perlu login terlebih dahulu.
+              Untuk melihat status pendaftaran SPMB, Anda perlu login terlebih dahulu.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link href="/login" className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300 text-center">
@@ -55,10 +55,10 @@ export default function PpdbStatus({ auth, applications = [] }) {
             </div>
             <h2 className="text-2xl font-bold text-center mb-4">Belum Ada Pendaftaran</h2>
             <p className="text-gray-600 text-center mb-8">
-              Anda belum melakukan pendaftaran PPDB. Silahkan daftar terlebih dahulu.
+              Anda belum melakukan pendaftaran SPMB. Silahkan daftar terlebih dahulu.
             </p>
             <div className="flex justify-center">
-              <Link href="/ppdb/pendaftaran" className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300">
+              <Link href="/spmb/pendaftaran" className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300">
                 Daftar Sekarang
               </Link>
             </div>
@@ -113,7 +113,7 @@ export default function PpdbStatus({ auth, applications = [] }) {
   
   return (
     <>
-      <Head title="Status Pendaftaran PPDB - SMK IT Baitul Aziz" />
+      <Head title="Status Pendaftaran SPMB - SMK IT Baitul Aziz" />
       
       <div className="min-h-screen bg-white text-gray-800">
         <Navbar />
@@ -123,10 +123,10 @@ export default function PpdbStatus({ auth, applications = [] }) {
             {/* Header */}
             <div className="mb-10 text-center">
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                Status Pendaftaran <span className="text-orange-500">PPDB</span>
+                Status Pendaftaran <span className="text-orange-500">SPMB</span>
               </h1>
               <p className="text-gray-600 max-w-xl mx-auto">
-                Berikut adalah informasi status pendaftaran PPDB Anda. Anda dapat melihat detail dan mencetak formulir pendaftaran.
+                Berikut adalah informasi status pendaftaran SPMB Anda. Anda dapat melihat detail dan mencetak formulir pendaftaran.
               </p>
             </div>
             
@@ -199,7 +199,7 @@ export default function PpdbStatus({ auth, applications = [] }) {
                 
                 <div className="mt-6 flex flex-col sm:flex-row gap-4">
                   <Link 
-                    href={`/ppdb/${application.id}`}
+                    href={`/spmb/${application.id}`}
                     className="px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg text-gray-700 text-sm font-medium transition-all duration-300 flex items-center justify-center"
                   >
                     <FileText className="h-4 w-4 mr-2" />
@@ -207,7 +207,7 @@ export default function PpdbStatus({ auth, applications = [] }) {
                   </Link>
                   
                   <Link 
-                    href={`/ppdb/${application.id}/cetak`}
+                    href={`/spmb/${application.id}/cetak`}
                     className="px-4 py-2 bg-orange-100 hover:bg-orange-200 border border-orange-200 rounded-lg text-orange-600 text-sm font-medium transition-all duration-300 flex items-center justify-center"
                   >
                     <Calendar className="h-4 w-4 mr-2" />
@@ -232,7 +232,7 @@ export default function PpdbStatus({ auth, applications = [] }) {
                           month: 'long', 
                       year: 'numeric' 
                     })}
-                    description="Pendaftaran PPDB Anda telah berhasil disubmit."
+                    description="Pendaftaran SPMB Anda telah berhasil disubmit."
                     status="completed"
                   />
                   
@@ -246,7 +246,7 @@ export default function PpdbStatus({ auth, applications = [] }) {
                   <StatusTimelineItem 
                     title="Pengumuman" 
                     date={application.status === 'Diterima' || application.status === 'Ditolak' || application.status === 'Cadangan' ? 'Selesai' : 'Menunggu'}
-                    description="Pengumuman hasil seleksi PPDB."
+                    description="Pengumuman hasil seleksi SPMB."
                     status={application.status === 'Diterima' || application.status === 'Ditolak' || application.status === 'Cadangan' ? 'completed' : 'waiting'}
                   />
                 </div>
@@ -386,7 +386,7 @@ export function StatusTimeline({ ppdb }: TimelineProps) {
           month: 'long', 
           year: 'numeric' 
         })}
-        description="Pendaftaran PPDB Anda telah berhasil disubmit."
+        description="Pendaftaran SPMB Anda telah berhasil disubmit."
         status="completed"
       />
       
@@ -400,7 +400,7 @@ export function StatusTimeline({ ppdb }: TimelineProps) {
       <StatusTimelineItem 
         title="Pengumuman" 
         date={ppdb.status === 'Diterima' || ppdb.status === 'Ditolak' || ppdb.status === 'Cadangan' ? 'Selesai' : 'Menunggu'}
-        description="Pengumuman hasil seleksi PPDB."
+        description="Pengumuman hasil seleksi SPMB."
         status={ppdb.status === 'Diterima' || ppdb.status === 'Ditolak' || ppdb.status === 'Cadangan' ? 'completed' : 'waiting'}
       />
     </div>

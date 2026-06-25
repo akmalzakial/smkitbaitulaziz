@@ -1,13 +1,32 @@
 import React, { useState } from 'react';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import AdminLayout from '@/layouts/AdminLayout';
-import {
-  Search, Filter, Download, Eye, Trash, Edit,
-  UserCheck, AlertTriangle, Clock, CheckCircle, Book
-} from 'lucide-react';
+import ArgonCard from '@/components/admin/ArgonCard';
+import ArgonTable from '@/components/admin/ArgonTable';
+import ArgonBadge from '@/components/admin/ArgonBadge';
+import ArgonPagination from '@/components/admin/ArgonPagination';
+import ArgonFormInput from '@/components/admin/ArgonFormInput';
 
-export default function AdminPpdbIndex({ auth, applications, filters = {} }) {
-  const [searchTerm, setSearchTerm] = useState(filters.search || '');
+interface AdminPpdbIndexProps {
+  auth: any;
+  applications: {
+    data: any[];
+    links: any[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    [key: string]: any;
+  };
+  filters?: {
+    search?: string;
+    status?: string;
+    jurusan?: string;
+    tahun?: string | number;
+  };
+}
+
+export default function AdminPpdbIndex({ auth, applications, filters = {} }: AdminPpdbIndexProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const { data, setData, get, processing } = useForm({
@@ -17,63 +36,42 @@ export default function AdminPpdbIndex({ auth, applications, filters = {} }) {
     tahun: filters.tahun || new Date().getFullYear()
   });
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    get(route('admin.ppdb.index'), {
+    get(route('admin.spmb.index'), {
       preserveState: true,
       replace: true
     });
   };
 
-  const handleFilterChange = (e) => {
-    setData(e.target.name, e.target.value);
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setData(e.target.name as any, e.target.value);
   };
 
-  const getStatusBadge = (status) => {
-    // Pastikan status ada dan konversi ke lowercase untuk pencocokan
+  const getStatusBadge = (status: string) => {
     const statusLower = status ? status.toLowerCase() : 'menunggu';
 
-    const statusConfig = {
-      'menunggu': {
-        color: 'bg-amber-500/20 text-amber-500 border-amber-500/20',
-        icon: <Clock className="h-4 w-4" />,
-        text: 'Menunggu'
-      },
-      'verifikasi': {
-        color: 'bg-blue-500/20 text-blue-500 border-blue-500/20',
-        icon: <UserCheck className="h-4 w-4" />,
-        text: 'Verifikasi'
-      },
-      'diterima': {
-        color: 'bg-green-500/20 text-green-500 border-green-500/20',
-        icon: <CheckCircle className="h-4 w-4" />,
-        text: 'Diterima'
-      },
-      'ditolak': {
-        color: 'bg-red-500/20 text-red-500 border-red-500/20',
-        icon: <AlertTriangle className="h-4 w-4" />,
-        text: 'Ditolak'
-      },
-      'cadangan': {
-        color: 'bg-purple-500/20 text-purple-500 border-purple-500/20',
-        icon: <Book className="h-4 w-4" />,
-        text: 'Cadangan'
-      }
+    const statusConfig: Record<string, { variant: string; text: string; icon: string }> = {
+      'menunggu': { variant: 'warning', text: 'Menunggu', icon: 'fa fa-clock' },
+      'verifikasi': { variant: 'info', text: 'Verifikasi', icon: 'fa fa-user-check' },
+      'diterima': { variant: 'success', text: 'Diterima', icon: 'fa fa-check-circle' },
+      'ditolak': { variant: 'danger', text: 'Ditolak', icon: 'fa fa-exclamation-triangle' },
+      'cadangan': { variant: 'purple', text: 'Cadangan', icon: 'fa fa-book' }
     };
 
     const config = statusConfig[statusLower] || statusConfig['menunggu'];
 
     return (
-      <div className={`inline-flex items-center px-2.5 py-1 rounded-full ${config.color} border text-xs font-medium`}>
-        {config.icon}
-        <span className="ml-1">{config.text}</span>
-      </div>
+      <ArgonBadge variant={config.variant as any} gradient>
+        <i className={`${config.icon} mr-1 text-[10px]`} />
+        {config.text}
+      </ArgonBadge>
     );
   };
 
-  const deleteApplication = (id) => {
+  const deleteApplication = (id: number | string) => {
     if (confirm('Apakah Anda yakin ingin menghapus data pendaftaran ini?')) {
-      router.delete(route('admin.ppdb.destroy', id), {
+      router.delete(route('admin.spmb.destroy', id), {
         onSuccess: () => {
           // Success notification is handled by Inertia
         },
@@ -83,277 +81,238 @@ export default function AdminPpdbIndex({ auth, applications, filters = {} }) {
 
   return (
     <AdminLayout>
-      <Head title="Kelola Pendaftaran PPDB - Admin Dashboard" />
+      <Head title="Kelola Pendaftaran SPMB - Admin Dashboard" />
 
-      <div className="px-6 py-8">
-        <div className="mb-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-white">
-              Kelola Pendaftaran PPDB
-            </h1>
-            <p className="mt-1 text-white">
-              Kelola dan lihat status pendaftaran peserta didik baru.
-            </p>
-          </div>
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-white mb-1">Kelola Pendaftaran SPMB</h1>
+        <p className="text-white/80 text-sm">
+          Kelola dan verifikasi status pendaftaran peserta didik baru SMK IT Baitul Aziz.
+        </p>
+      </div>
 
-          <div className="flex flex-col sm:flex-row gap-3">
-            <a
-              href={route('admin.ppdb.export')}
-              className="inline-flex items-center justify-center px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors"
-              target="_blank"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Export Data
-            </a>
-          </div>
-        </div>
+      {/* Main card */}
+      <ArgonCard
+        title="Daftar Pendaftar"
+        headerRight={
+          <a
+            href={route('admin.spmb.export')}
+            className="inline-block px-4 py-2 bg-gradient-to-tl from-orange-500 to-yellow-500 text-white text-xs font-bold uppercase rounded-lg shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-px cursor-pointer"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <i className="fas fa-download mr-1.5" /> Export Data
+          </a>
+        }
+        noPadding
+      >
+        {/* Search and Filters */}
+        <div className="p-6 pb-2">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <form onSubmit={handleSearch} className="flex-1 max-w-md">
+              <ArgonFormInput
+                type="text"
+                placeholder="Cari nama atau nomor pendaftaran..."
+                value={data.search}
+                onChange={(e) => setData('search', e.target.value)}
+                icon="fas fa-search"
+                wrapperClassName="mb-0"
+              />
+            </form>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="p-4 sm:p-6 border-b border-gray-200">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              <form onSubmit={handleSearch} className="flex-1">
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <Search className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-orange-500 focus:border-orange-500 block w-full pl-10 p-2.5 transition-all"
-                    placeholder="Cari berdasarkan nama atau nomor pendaftaran..."
-                    value={data.search}
-                    onChange={(e) => setData('search', e.target.value)}
-                  />
-                </div>
-              </form>
-
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className="inline-flex items-center px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors"
+                className="inline-flex items-center px-4 py-2 bg-gray-50 border border-gray-200 text-slate-600 text-xs font-bold uppercase rounded-lg hover:bg-gray-100 transition-all cursor-pointer"
               >
-                <Filter className="h-4 w-4 mr-2" />
-                Filter
+                <i className="fas fa-filter mr-1.5" /> Filter
               </button>
             </div>
+          </div>
 
-            {isFilterOpen && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label htmlFor="status-filter" className="block text-sm font-medium text-gray-700 mb-1">
-                      Status
-                    </label>
-                    <select
-                      id="status-filter"
-                      name="status"
-                      value={data.status}
-                      onChange={handleFilterChange}
-                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5"
-                      aria-label="Filter berdasarkan status"
-                    >
-                      <option value="">Semua Status</option>
-                      <option value="Menunggu">Menunggu</option>
-                      <option value="Verifikasi">Verifikasi</option>
-                      <option value="Diterima">Diterima</option>
-                      <option value="Ditolak">Ditolak</option>
-                      <option value="Cadangan">Cadangan</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label htmlFor="jurusan-filter" className="block text-sm font-medium text-gray-700 mb-1">
-                      Jurusan
-                    </label>
-                    <select
-                      id="jurusan-filter"
-                      name="jurusan"
-                      value={data.jurusan}
-                      onChange={handleFilterChange}
-                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5"
-                      aria-label="Filter berdasarkan jurusan"
-                    >
-                      <option value="">Semua Jurusan</option>
-                      <option value="PPLG (Program Pengembangan Perangkat Lunak dan Gim)">PPLG (Program Pengembangan Perangkat Lunak dan Gim)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label htmlFor="tahun-filter" className="block text-sm font-medium text-gray-700 mb-1">
-                      Tahun
-                    </label>
-                    <select
-                      id="tahun-filter"
-                      name="tahun"
-                      value={data.tahun}
-                      onChange={handleFilterChange}
-                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5"
-                      aria-label="Filter berdasarkan tahun"
-                    >
-                      <option value={new Date().getFullYear()}>{new Date().getFullYear()}</option>
-                      <option value={new Date().getFullYear() - 1}>{new Date().getFullYear() - 1}</option>
-                      <option value={new Date().getFullYear() - 2}>{new Date().getFullYear() - 2}</option>
-                    </select>
-                  </div>
+          {isFilterOpen && (
+            <div className="mt-4 p-4 bg-gray-50/50 rounded-xl border border-gray-100">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label htmlFor="status-filter" className="block text-xs font-bold uppercase text-slate-400 mb-2">
+                    Status
+                  </label>
+                  <select
+                    id="status-filter"
+                    name="status"
+                    value={data.status}
+                    onChange={handleFilterChange}
+                    className="text-sm w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-slate-700 focus:border-orange-500 focus:outline-none"
+                    aria-label="Filter berdasarkan status"
+                  >
+                    <option value="">Semua Status</option>
+                    <option value="Menunggu">Menunggu</option>
+                    <option value="Verifikasi">Verifikasi</option>
+                    <option value="Diterima">Diterima</option>
+                    <option value="Ditolak">Ditolak</option>
+                    <option value="Cadangan">Cadangan</option>
+                  </select>
                 </div>
 
-                <div className="mt-4 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setData({
-                        search: '',
-                        status: '',
-                        jurusan: '',
-                        tahun: new Date().getFullYear()
-                      });
-                    }}
-                    className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900 font-medium mr-2"
+                <div>
+                  <label htmlFor="jurusan-filter" className="block text-xs font-bold uppercase text-slate-400 mb-2">
+                    Jurusan
+                  </label>
+                  <select
+                    id="jurusan-filter"
+                    name="jurusan"
+                    value={data.jurusan}
+                    onChange={handleFilterChange}
+                    className="text-sm w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-slate-700 focus:border-orange-500 focus:outline-none"
+                    aria-label="Filter berdasarkan jurusan"
                   >
-                    Reset
-                  </button>
+                    <option value="">Semua Jurusan</option>
+                    <option value="PPLG (Program Pengembangan Perangkat Lunak dan Gim)">PPLG (Program Pengembangan Perangkat Lunak dan Gim)</option>
+                  </select>
+                </div>
 
-                  <button
-                    type="button"
-                    onClick={handleSearch}
-                    disabled={processing}
-                    className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors disabled:bg-orange-300"
+                <div>
+                  <label htmlFor="tahun-filter" className="block text-xs font-bold uppercase text-slate-400 mb-2">
+                    Tahun
+                  </label>
+                  <select
+                    id="tahun-filter"
+                    name="tahun"
+                    value={data.tahun}
+                    onChange={handleFilterChange}
+                    className="text-sm w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-slate-700 focus:border-orange-500 focus:outline-none"
+                    aria-label="Filter berdasarkan tahun"
                   >
-                    Terapkan Filter
-                  </button>
+                    <option value={new Date().getFullYear()}>{new Date().getFullYear()}</option>
+                    <option value={new Date().getFullYear() - 1}>{new Date().getFullYear() - 1}</option>
+                    <option value={new Date().getFullYear() - 2}>{new Date().getFullYear() - 2}</option>
+                  </select>
                 </div>
               </div>
-            )}
-          </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left text-gray-500">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-3">
-                    No. Pendaftaran
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Nama Lengkap
-                  </th>
-                  {/* <th scope="col" className="px-6 py-3">
-                    Pilihan Jurusan
-                  </th> */}
-                  <th scope="col" className="px-6 py-3">
-                    Asal Sekolah
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Tanggal Daftar
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Status
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Aksi
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {applications && Array.isArray(applications.data) && applications.data.length > 0 ? (
-                  applications.data.map((app) => (
-                    <tr key={app.id} className="bg-white border-b hover:bg-gray-50">
-                      <td className="px-6 py-4 font-medium text-gray-900">
-                        {app.nomor_pendaftaran}
-                      </td>
-                      <td className="px-6 py-4 font-medium text-gray-900">
-                        {app.nama_lengkap}
-                      </td>
-                      {/* <td className="px-6 py-4">
-                        <div className="flex flex-col">
-                          <span className="text-gray-900">1. {app.jurusan_1 || "Tidak ada"}</span>
-                          {app.jurusan_2 && (
-                            <span className="text-gray-500 text-xs mt-1">2. {app.jurusan_2}</span>
-                          )}
-                        </div>
-                      </td> */}
-                      <td className="px-6 py-4">
-                        {app.sekolah_asal}
-                      </td>
-                      <td className="px-6 py-4">
-                        {new Date(app.created_at).toLocaleDateString('id-ID', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric'
-                        })}
-                      </td>
-                      <td className="px-6 py-4">
-                        {getStatusBadge(app.status)}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center space-x-2">
-                          <Link
-                            href={route('admin.ppdb.show', app.id)}
-                            className="p-1.5 bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 rounded-lg transition-colors"
-                            title="Lihat Detail"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Link>
+              <div className="mt-4 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setData({
+                      search: '',
+                      status: '',
+                      jurusan: '',
+                      tahun: new Date().getFullYear()
+                    });
+                  }}
+                  className="px-4 py-2 text-xs font-bold uppercase text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  Reset
+                </button>
 
-                          <Link
-                            href={`${route('admin.ppdb.show', app.id)}?action=edit`}
-                            className="p-1.5 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 rounded-lg transition-colors"
-                            title="Edit Status"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Link>
-
-                          <button
-                            type="button"
-                            className="p-1.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-lg transition-colors"
-                            title="Hapus"
-                            onClick={() => deleteApplication(app.id)}
-                          >
-                            <Trash className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  // Handle ketika applications.data tidak ada atau kosong
-                  <tr className="bg-white border-b hover:bg-gray-50">
-                    <td colSpan={7} className="px-6 py-10 text-center text-gray-500">
-                      Tidak ada data pendaftaran yang ditemukan
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {applications && applications.data && applications.data.length > 0 && applications.from && applications.to && applications.total && applications.links && (
-            <div className="p-4 border-t border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-500">
-                  Menampilkan {applications.from} - {applications.to} dari {applications.total} hasil
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  {applications.links.map((link, i) => (
-                    <Link
-                      key={i}
-                      href={link.url || '#'}
-                      className={`px-3 py-1 rounded-md text-sm ${link.active
-                          ? 'bg-orange-500 text-white'
-                          : link.url
-                            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            : 'bg-gray-50 text-gray-400 cursor-default'
-                        }`}
-                      preserveScroll
-                    >
-                      {link.label.replace('&laquo;', '«').replace('&raquo;', '»')}
-                    </Link>
-                  ))}
-                </div>
+                <button
+                  type="button"
+                  onClick={handleSearch}
+                  disabled={processing}
+                  className="px-4 py-2 bg-gradient-to-tl from-orange-500 to-yellow-500 text-white text-xs font-bold uppercase rounded-lg shadow-md hover:shadow-lg transition-all"
+                >
+                  Terapkan Filter
+                </button>
               </div>
             </div>
           )}
         </div>
-      </div>
+
+        {/* Table layout */}
+        <ArgonTable
+          headers={[
+            'No. Pendaftaran',
+            'Nama Lengkap',
+            'Asal Sekolah',
+            'Tanggal Daftar',
+            { label: 'Status', align: 'left' },
+            { label: 'Aksi', align: 'right' }
+          ]}
+        >
+          {applications && Array.isArray(applications.data) && applications.data.length > 0 ? (
+            applications.data.map((app) => (
+              <tr key={app.id}>
+                {/* Registration Number */}
+                <td className="p-2 px-6 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent text-sm font-semibold text-slate-700">
+                  {app.nomor_pendaftaran}
+                </td>
+
+                {/* Full Name */}
+                <td className="p-2 px-6 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent text-sm font-semibold text-slate-700">
+                  {app.nama_lengkap}
+                </td>
+
+                {/* School */}
+                <td className="p-2 px-6 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent text-xs font-semibold leading-tight text-slate-500">
+                  {app.sekolah_asal}
+                </td>
+
+                {/* Registration Date */}
+                <td className="p-2 px-6 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent text-xs font-semibold leading-tight text-slate-500">
+                  {new Date(app.created_at).toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                  })}
+                </td>
+
+                {/* Status Badge */}
+                <td className="p-2 px-6 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                  {getStatusBadge(app.status)}
+                </td>
+
+                {/* Actions */}
+                <td className="p-2 px-6 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent text-right">
+                  <div className="flex items-center justify-end space-x-2">
+                    <Link
+                      href={route('admin.spmb.show', app.id)}
+                      className="inline-flex items-center justify-center w-8 h-8 bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 rounded-lg transition-colors"
+                      title="Lihat Detail"
+                    >
+                      <i className="fas fa-eye text-xs" />
+                    </Link>
+
+                    <Link
+                      href={`${route('admin.spmb.show', app.id)}?action=edit`}
+                      className="inline-flex items-center justify-center w-8 h-8 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 rounded-lg transition-colors"
+                      title="Edit Status"
+                    >
+                      <i className="fas fa-edit text-xs" />
+                    </Link>
+
+                    <button
+                      type="button"
+                      className="inline-flex items-center justify-center w-8 h-8 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-lg transition-colors cursor-pointer"
+                      title="Hapus"
+                      onClick={() => deleteApplication(app.id)}
+                    >
+                      <i className="fas fa-trash text-xs" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={6} className="p-8 text-center text-slate-400 text-sm">
+                Tidak ada data pendaftaran yang ditemukan.
+              </td>
+            </tr>
+          )}
+        </ArgonTable>
+
+        {/* Pagination links */}
+        {applications && applications.links && (
+          <ArgonPagination
+            links={applications.links}
+            from={applications.from}
+            to={applications.to}
+            total={applications.total}
+          />
+        )}
+      </ArgonCard>
     </AdminLayout>
   );
-} 
+}

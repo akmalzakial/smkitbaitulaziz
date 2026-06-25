@@ -342,8 +342,8 @@ export default function PpdbCreate({ auth, existingApplication = null }: { auth:
     console.log('Submitting form data:', data);
     
     const endpoint = isEditMode 
-      ? route('ppdb.update', existingApplication?.id)
-      : route('ppdb.store');
+      ? route('spmb.update', existingApplication?.id)
+      : route('spmb.store');
     
     // Validasi data client-side
     const requiredFields = [
@@ -459,7 +459,7 @@ export default function PpdbCreate({ auth, existingApplication = null }: { auth:
         setShowSuccessModal(true);
         setProcessing(false);
         setTimeout(() => {
-          router.visit(route('ppdb.status'));
+          router.visit(route('spmb.status'));
         }, 3000);
       },
       onError: (errors) => {
@@ -531,7 +531,7 @@ export default function PpdbCreate({ auth, existingApplication = null }: { auth:
               Anda sudah memiliki pendaftaran aktif pada sistem kami. Silahkan cek status pendaftaran Anda atau edit data pendaftaran.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link href="/ppdb/status" className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300 text-center">
+              <Link href="/spmb/status" className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300 text-center">
                 Cek Status Pendaftaran
               </Link>
               <button 
@@ -581,7 +581,7 @@ export default function PpdbCreate({ auth, existingApplication = null }: { auth:
   
   return (
     <>
-      <Head title={isEditMode ? 'Edit Formulir Pendaftaran PPDB - SMK IT Baitul Aziz' : 'Formulir Pendaftaran PPDB - SMK IT Baitul Aziz'} />
+      <Head title={isEditMode ? 'Edit Formulir Pendaftaran SPMB - SMK IT Baitul Aziz' : 'Formulir Pendaftaran SPMB - SMK IT Baitul Aziz'} />
       
       <div className="min-h-screen bg-white text-gray-800">
         <Navbar />
@@ -591,7 +591,7 @@ export default function PpdbCreate({ auth, existingApplication = null }: { auth:
             {/* Header */}
             <div className="mb-10 text-center">
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                {isEditMode ? 'Edit Formulir' : 'Formulir Pendaftaran'} <span className="text-orange-500">PPDB</span>
+                {isEditMode ? 'Edit Formulir' : 'Formulir Pendaftaran'} <span className="text-orange-500">SPMB</span>
               </h1>
               <p className="text-gray-600 max-w-xl mx-auto mb-4">
                 {isEditMode 
@@ -1180,7 +1180,7 @@ export default function PpdbCreate({ auth, existingApplication = null }: { auth:
                 ) : (
                   isEditMode ? (
                     <Link 
-                      href="/ppdb/status"
+                      href="/spmb/status"
                       className="px-5 py-2 bg-red-100 hover:bg-red-200 border border-red-300 rounded-lg text-red-700 font-medium transition-all duration-300"
                     >
                       Batal

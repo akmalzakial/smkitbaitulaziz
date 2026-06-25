@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, Upload, X } from 'lucide-react';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Editor } from '@tinymce/tinymce-react';
+import ArgonCard from '@/components/admin/ArgonCard';
+import ArgonFormInput from '@/components/admin/ArgonFormInput';
 
 const Create: React.FC = () => {
     const [title, setTitle] = useState('');
@@ -35,18 +36,11 @@ const Create: React.FC = () => {
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setTitle(value);
-
-        // Auto generate slug jika user belum mengetik slug secara manual (atau kita bisa overwrite selalu)
-        // Di sini saya buat overwrite selalu untuk kemudahan, kecuali user mengedit slug terpisah
-        // Tapi untuk UI terbaik, biasanya slug mengikuti title selama slug belum disentuh.
-        // Untuk sederhananya, kita update slug setiap title berubah.
         setSlug(generateSlug(value));
     };
 
     // Daftar kategori yang tersedia
     const availableCategories = ['Akademik', 'Kegiatan Sekolah', 'Prestasi', 'Pengumuman', 'Artikel', 'Lainnya'];
-
-    // Menangani perubahan file gambar
 
     // Menangani perubahan file gambar
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -142,7 +136,6 @@ const Create: React.FC = () => {
 
         router.post('/admin/news', formData, {
             onSuccess: () => {
-                // Navigasi ke halaman daftar berita jika berhasil
                 router.visit('/admin/news');
             },
             onError: (errors) => {
@@ -159,263 +152,242 @@ const Create: React.FC = () => {
         <AdminLayout>
             <Head title="Tambah Berita - SMK IT Baitul Aziz" />
 
-            <div className="container mx-auto px-4 py-8">
-                <div className="mb-6">
+            {/* Header and Back Link */}
+            <div className="mb-6">
+                <Link
+                    href="/admin/news"
+                    className="text-white hover:text-white/80 inline-flex items-center text-sm transition-colors"
+                >
+                    <i className="fas fa-arrow-left mr-1.5" /> Kembali ke Daftar Berita
+                </Link>
+                <h1 className="text-2xl font-bold text-white mt-2">Tambah Berita Baru</h1>
+            </div>
+
+            <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Left Column - Main Content */}
+                    <div className="lg:col-span-2 space-y-6">
+                        <ArgonCard title="Tulis Artikel Berita">
+                            {/* Judul */}
+                            <ArgonFormInput
+                                label="Judul Berita *"
+                                type="text"
+                                id="title"
+                                value={title}
+                                onChange={handleTitleChange}
+                                error={errors.title}
+                                placeholder="Masukkan judul berita"
+                                icon="fas fa-heading"
+                                required
+                            />
+
+                            {/* Slug */}
+                            <ArgonFormInput
+                                label="Slug *"
+                                type="text"
+                                id="slug"
+                                value={slug}
+                                onChange={(e) => setSlug(e.target.value)}
+                                error={errors.slug}
+                                placeholder="slug-berita-otomatis"
+                                icon="fas fa-link"
+                                required
+                            />
+
+                            {/* Ringkasan */}
+                            <div className="mb-4">
+                                <label htmlFor="summary" className="block text-xs font-bold uppercase text-slate-400 mb-2">
+                                    Ringkasan <span className="text-slate-300 font-normal">(opsional)</span>
+                                </label>
+                                <textarea
+                                    id="summary"
+                                    value={summary}
+                                    onChange={(e) => setSummary(e.target.value)}
+                                    rows={3}
+                                    className="text-sm w-full rounded-lg border border-solid border-gray-300 bg-white py-2 px-3 text-slate-700 focus:border-orange-500 focus:outline-none focus:shadow-primary-outline transition-all"
+                                    placeholder="Ringkasan singkat untuk ditampilkan di kartu berita..."
+                                />
+                            </div>
+
+                            {/* Editor Konten */}
+                            <div className="mb-4">
+                                <label className="block text-xs font-bold uppercase text-slate-400 mb-2">
+                                    Konten Berita *
+                                </label>
+                                <div className="rounded-xl overflow-hidden border border-gray-300 shadow-sm">
+                                    <Editor
+                                        apiKey='us5k11n22fvccimhy645zjsiqgkl4l5du8597i653h7qqni0'
+                                        onInit={(evt, editor) => editorRef.current = editor}
+                                        initialValue=""
+                                        init={{
+                                            height: 450,
+                                            menubar: true,
+                                            plugins: [
+                                                'advlist autolink lists link image charmap print preview anchor',
+                                                'searchreplace visualblocks code fullscreen',
+                                                'insertdatetime media table paste code help wordcount'
+                                            ],
+                                            toolbar: 'undo redo | formatselect | ' +
+                                                'bold italic backcolor | alignleft aligncenter ' +
+                                                'alignright alignjustify | bullist numlist outdent indent | ' +
+                                                'removeformat | help',
+                                            content_style: 'body { font-family:Open Sans,system-ui,sans-serif; font-size:14px }'
+                                        }}
+                                        onEditorChange={setContent}
+                                    />
+                                </div>
+                                {errors.content && (
+                                    <p className="mt-2 text-xs text-red-500 font-semibold flex items-center">
+                                        <span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>
+                                        {errors.content}
+                                    </p>
+                                )}
+                            </div>
+                        </ArgonCard>
+                    </div>
+
+                    {/* Right Column - Sidebar */}
+                    <div className="space-y-6">
+                        {/* Gambar Berita */}
+                        <ArgonCard title="Gambar Utama">
+                            {!imagePreview ? (
+                                <div
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex justify-center items-center flex-col cursor-pointer hover:border-orange-500 hover:bg-orange-500/5 transition-all duration-300 group bg-white"
+                                >
+                                    <div className="p-3 rounded-full bg-orange-500/10 group-hover:bg-orange-500/20 transition-colors mb-3">
+                                        <i className="fas fa-upload text-orange-500 text-lg" />
+                                    </div>
+                                    <p className="text-sm font-semibold text-slate-700 group-hover:text-orange-500 transition-colors text-center">
+                                        Klik untuk unggah
+                                    </p>
+                                    <p className="text-xs text-slate-400 mt-1 text-center">
+                                        Max 2MB (JPG/PNG/WebP)
+                                    </p>
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        className="hidden"
+                                        onChange={handleImageChange}
+                                        accept="image/jpeg,image/png,image/jpg,image/webp"
+                                    />
+                                </div>
+                            ) : (
+                                <div className="relative group">
+                                    <div className="relative rounded-xl overflow-hidden shadow-md ring-2 ring-orange-500/20">
+                                        <img
+                                            src={imagePreview}
+                                            alt="Preview"
+                                            className="w-full h-48 object-cover"
+                                        />
+                                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3 flex justify-end">
+                                            <button
+                                                type="button"
+                                                onClick={removeImage}
+                                                className="bg-red-600 hover:bg-red-700 text-white p-1.5 px-3 rounded-lg shadow-lg transition-transform transform hover:scale-105 flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
+                                            >
+                                                <i className="fas fa-trash text-xs" />
+                                                Hapus
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            {errors.image && (
+                                <p className="mt-2 text-xs text-red-500 font-semibold flex items-center">
+                                    <span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>
+                                    {errors.image}
+                                </p>
+                            )}
+                        </ArgonCard>
+
+                        {/* Publishing Options */}
+                        <ArgonCard title="Opsi Publikasi">
+                            {/* Kategori */}
+                            <div className="mb-4">
+                                <label htmlFor="category" className="block text-xs font-bold uppercase text-slate-400 mb-2">
+                                    Kategori
+                                </label>
+                                <div className="relative flex flex-wrap items-stretch w-full transition-all rounded-lg ease">
+                                    <span className="text-sm ease absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-3 text-center font-normal text-slate-500 transition-all leading-5">
+                                        <i className="fas fa-folder" />
+                                    </span>
+                                    <select
+                                        id="category"
+                                        value={category}
+                                        onChange={(e) => setCategory(e.target.value)}
+                                        className="text-sm w-full rounded-lg border border-solid border-gray-300 bg-white py-2 pr-3 pl-9 text-slate-700 focus:border-orange-500 focus:outline-none focus:shadow-primary-outline transition-all"
+                                    >
+                                        <option value="">-- Pilih Kategori --</option>
+                                        {availableCategories.map((cat, index) => (
+                                            <option key={index} value={cat}>{cat}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* Penulis */}
+                            <ArgonFormInput
+                                label="Penulis (Opsional)"
+                                type="text"
+                                id="author"
+                                value={author}
+                                onChange={(e) => setAuthor(e.target.value)}
+                                placeholder="Nama penulis"
+                                icon="fas fa-user"
+                            />
+
+                            {/* Unggulan */}
+                            <div className="flex items-start pt-2">
+                                <div className="flex items-center h-5">
+                                    <input
+                                        id="is_featured"
+                                        type="checkbox"
+                                        checked={isFeatured}
+                                        onChange={(e) => setIsFeatured(e.target.checked)}
+                                        className="h-5 w-5 text-orange-500 focus:ring-orange-500 border-gray-300 rounded cursor-pointer accent-orange-500"
+                                    />
+                                </div>
+                                <div className="ml-3 text-xs">
+                                    <label htmlFor="is_featured" className="font-bold text-slate-700 cursor-pointer select-none">
+                                        Berita Unggulan
+                                    </label>
+                                    <p className="text-slate-400 mt-0.5">
+                                        Tampilkan di slide utama website
+                                    </p>
+                                </div>
+                            </div>
+                        </ArgonCard>
+                    </div>
+                </div>
+
+                {/* Footer Buttons */}
+                <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-100 mt-6">
                     <Link
                         href="/admin/news"
-                        className="text-white hover:text-blue-800 inline-flex items-center"
+                        className="px-4 py-2 text-xs font-bold uppercase text-slate-400 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg cursor-pointer transition-all duration-200"
                     >
-                        <ArrowLeft className="h-4 w-4 mr-1" />
-                        Kembali ke Daftar Berita
+                        Batal
                     </Link>
-                    <h1 className="text-2xl font-bold text-white mt-2">Tambah Berita Baru</h1>
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="inline-flex items-center px-4 py-2 bg-gradient-to-tl from-orange-500 to-yellow-500 text-white text-xs font-bold uppercase rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isSubmitting ? (
+                            <>
+                                <i className="fas fa-spinner animate-spin mr-1.5" />
+                                Menyimpan...
+                            </>
+                        ) : (
+                            <>
+                                <i className="fas fa-save mr-1.5" />
+                                Simpan Berita
+                            </>
+                        )}
+                    </button>
                 </div>
-
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-                    <form onSubmit={handleSubmit}>
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            {/* Left Column - Main Content */}
-                            <div className="lg:col-span-2 space-y-6">
-                                {/* Judul */}
-                                <div>
-                                    <label htmlFor="title" className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Judul Berita <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="title"
-                                        value={title}
-                                        onChange={handleTitleChange}
-                                        className={`block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3 px-4 ${errors.title ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''}`}
-                                        placeholder="Masukkan judul berita"
-                                    />
-                                    {errors.title && (
-                                        <p className="mt-2 text-sm text-red-600 flex items-center">
-                                            <span className="w-1 h-1 bg-red-600 rounded-full mr-2"></span>
-                                            {errors.title}
-                                        </p>
-                                    )}
-                                </div>
-
-                                {/* Slug */}
-                                <div>
-                                    <label htmlFor="slug" className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Slug <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="slug"
-                                        value={slug}
-                                        onChange={(e) => setSlug(e.target.value)}
-                                        className={`block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3 px-4 ${errors.slug ? 'border-red-300' : ''}`}
-                                        placeholder="slug-berita-otomatis"
-                                    />
-                                    {errors.slug && (
-                                        <p className="mt-2 text-sm text-red-600">{errors.slug}</p>
-                                    )}
-                                </div>
-
-                                {/* Ringkasan */}
-                                <div>
-                                    <label htmlFor="summary" className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Ringkasan <span className="text-gray-400 font-normal">(opsional)</span>
-                                    </label>
-                                    <textarea
-                                        id="summary"
-                                        value={summary}
-                                        onChange={(e) => setSummary(e.target.value)}
-                                        rows={3}
-                                        className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3 px-4"
-                                        placeholder="Ringkasan singkat untuk ditampilkan di kartu berita..."
-                                    />
-                                </div>
-
-                                {/* Editor Konten */}
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Konten Berita <span className="text-red-500">*</span>
-                                    </label>
-                                    <div className="rounded-xl overflow-hidden border border-gray-300 shadow-sm">
-                                        <Editor
-                                            apiKey='us5k11n22fvccimhy645zjsiqgkl4l5du8597i653h7qqni0'
-                                            onInit={(evt, editor) => editorRef.current = editor}
-                                            initialValue=""
-                                            init={{
-                                                height: 500,
-                                                menubar: true,
-                                                plugins: [
-                                                    'advlist autolink lists link image charmap print preview anchor',
-                                                    'searchreplace visualblocks code fullscreen',
-                                                    'insertdatetime media table paste code help wordcount'
-                                                ],
-                                                toolbar: 'undo redo | formatselect | ' +
-                                                    'bold italic backcolor | alignleft aligncenter ' +
-                                                    'alignright alignjustify | bullist numlist outdent indent | ' +
-                                                    'removeformat | help',
-                                                content_style: 'body { font-family:Inter,system-ui,sans-serif; font-size:14px }'
-                                            }}
-                                            onEditorChange={setContent}
-                                        />
-                                    </div>
-                                    {errors.content && (
-                                        <p className="mt-2 text-sm text-red-600 flex items-center">
-                                            <span className="w-1 h-1 bg-red-600 rounded-full mr-2"></span>
-                                            {errors.content}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Right Column - Sidebar */}
-                            <div className="space-y-6">
-                                {/* Gambar Berita */}
-                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                                    <label className="block text-sm font-semibold text-gray-700 mb-3">
-                                        Gambar Utama <span className="text-red-500">*</span>
-                                    </label>
-                                    {!imagePreview ? (
-                                        <div
-                                            onClick={() => fileInputRef.current?.click()}
-                                            className="mt-1 border-2 border-dashed border-gray-300 rounded-xl p-8 flex justify-center items-center flex-col cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all duration-300 group bg-white"
-                                        >
-                                            <div className="p-3 rounded-full bg-blue-50 group-hover:bg-blue-100 transition-colors mb-3">
-                                                <Upload className="h-6 w-6 text-blue-500" />
-                                            </div>
-                                            <p className="mt-1 text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors text-center">
-                                                Klik untuk unggah
-                                            </p>
-                                            <p className="text-xs text-gray-400 mt-1 text-center">
-                                                Max 2MB (JPG/PNG)
-                                            </p>
-                                            <input
-                                                type="file"
-                                                ref={fileInputRef}
-                                                className="hidden"
-                                                onChange={handleImageChange}
-                                                accept="image/jpeg,image/png,image/jpg,image/webp"
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div className="mt-1 relative group">
-                                            <div className="relative rounded-xl overflow-hidden shadow-md ring-2 ring-blue-100">
-                                                <img
-                                                    src={imagePreview}
-                                                    alt="Preview"
-                                                    className="w-full h-48 object-cover"
-                                                />
-                                                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3 flex justify-end">
-                                                    <button
-                                                        type="button"
-                                                        onClick={removeImage}
-                                                        className="bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-lg shadow-lg transition-transform transform hover:scale-105 flex items-center gap-1.5 text-xs font-medium"
-                                                    >
-                                                        <X className="h-3.5 w-3.5" />
-                                                        Hapus
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-                                    {errors.image && (
-                                        <p className="mt-2 text-sm text-red-600 flex items-center">
-                                            <span className="w-1 h-1 bg-red-600 rounded-full mr-2"></span>
-                                            {errors.image}
-                                        </p>
-                                    )}
-                                </div>
-
-                                {/* Publishing Options */}
-                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 space-y-5">
-                                    <h3 className="font-semibold text-gray-900 border-b border-gray-200 pb-3">Opsi Publikasi</h3>
-
-                                    {/* Kategori */}
-                                    <div>
-                                        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                                            Kategori
-                                        </label>
-                                        <div className="relative">
-                                            <select
-                                                id="category"
-                                                value={category}
-                                                onChange={(e) => setCategory(e.target.value)}
-                                                className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5 px-3 appearance-none bg-white"
-                                            >
-                                                <option value="">-- Pilih Kategori --</option>
-                                                {availableCategories.map((cat, index) => (
-                                                    <option key={index} value={cat}>{cat}</option>
-                                                ))}
-                                            </select>
-                                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
-                                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Penulis */}
-                                    <div>
-                                        <label htmlFor="author" className="block text-sm font-medium text-gray-700 mb-2">
-                                            Penulis <span className="text-gray-400 text-xs">(Opsional)</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="author"
-                                            value={author}
-                                            onChange={(e) => setAuthor(e.target.value)}
-                                            className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5 px-3 bg-white"
-                                            placeholder="Nama penulis"
-                                        />
-                                    </div>
-
-                                    {/* Unggulan */}
-                                    <div className="flex items-start pt-2">
-                                        <div className="flex items-center h-5">
-                                            <input
-                                                id="is_featured"
-                                                type="checkbox"
-                                                checked={isFeatured}
-                                                onChange={(e) => setIsFeatured(e.target.checked)}
-                                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
-                                            />
-                                        </div>
-                                        <div className="ml-3 text-sm">
-                                            <label htmlFor="is_featured" className="font-medium text-gray-700 cursor-pointer select-none">
-                                                Berita Unggulan
-                                            </label>
-                                            <p className="text-gray-500 text-xs mt-0.5">
-                                                Tampilkan di slide utama website
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center justify-end space-x-4 pt-8 border-t border-gray-100 mt-8">
-                            <Link
-                                href="/admin/news"
-                                className="inline-flex justify-center py-2.5 px-6 border border-gray-300 shadow-sm text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-colors"
-                            >
-                                Batal
-                            </Link>
-                            <button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className={`inline-flex justify-center py-2.5 px-6 border border-transparent shadow-sm text-sm font-medium rounded-xl text-black bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-md transform hover:-translate-y-0.5'}`}
-                            >
-                                {isSubmitting ? (
-                                    <>
-                                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Menyimpan...
-                                    </>
-                                ) : 'Simpan Berita'}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+            </form>
         </AdminLayout>
     );
 };

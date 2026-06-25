@@ -127,6 +127,25 @@ class HomeController extends Controller
      */
     public function contact()
     {
-        return Inertia::render('Contact');
+        return Inertia::render('Contact', [
+            'contactSettings' => \App\Models\ContactSetting::current()
+        ]);
+    }
+
+    /**
+     * Handle the submission of the contact form.
+     */
+    public function submitContact(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string|max:5000',
+        ]);
+
+        \App\Models\ContactMessage::create($validated);
+
+        return redirect()->back()->with('success', 'Pesan Anda berhasil dikirim!');
     }
 } 

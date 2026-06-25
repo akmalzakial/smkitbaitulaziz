@@ -1,9 +1,9 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AdminLayout from '@/layouts/AdminLayout';
-import { ArrowLeft, Edit, Calendar, User, Tag, Star, Clock } from 'lucide-react';
-import { motion } from 'framer-motion';
 import ImagePlaceholder from '@/components/ImagePlaceholder';
+import ArgonCard from '@/components/admin/ArgonCard';
+import ArgonBadge from '@/components/admin/ArgonBadge';
 
 interface User {
   id: number;
@@ -32,100 +32,110 @@ interface Props {
 const Show: React.FC<Props> = ({ news }) => {
   return (
     <AdminLayout>
-      <Head title={`${news.title} - Detail Berita - SMK IT Baitul Aziz`} />
+      <Head title={`${news.title} - Detail Berita - Admin Dashboard`} />
       
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
+      {/* Header and Back Link */}
+      <div className="mb-6">
+        <Link 
+          href="/admin/news" 
+          className="text-white hover:text-white/80 inline-flex items-center text-sm transition-colors mb-4"
+        >
+          <i className="fas fa-arrow-left mr-1.5" /> Kembali ke Daftar Berita
+        </Link>
+
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-white mb-1">{news.title}</h1>
+            <p className="text-white/80 text-sm">Detail data berita / artikel SMK IT Baitul Aziz.</p>
+          </div>
+          
           <Link 
-            href="/admin/news" 
-            className="text-blue-600 hover:text-blue-800 inline-flex items-center"
+            href={`/admin/news/${news.id}/edit`} 
+            className="inline-block px-4 py-2 bg-gradient-to-tl from-orange-500 to-yellow-500 text-white text-xs font-bold uppercase rounded-lg shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-px text-center"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Kembali ke daftar berita
+            <i className="fas fa-edit mr-1.5" /> Edit Berita
           </Link>
         </div>
-        
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="p-6">
-            <div className="flex justify-between items-start mb-4">
-              <h1 className="text-2xl font-bold text-gray-800">{news.title}</h1>
-              <Link 
-                href={`/admin/news/${news.id}/edit`} 
-                className="bg-amber-500 hover:bg-amber-600 text-white py-2 px-4 rounded-lg inline-flex items-center transition-colors duration-300"
-              >
-                <Edit className="h-5 w-5 mr-2" />
-                Edit
-              </Link>
-            </div>
-            
-            <div className="flex flex-wrap gap-4 mb-6 text-sm text-gray-600">
-              {news.category && (
-                <div className="flex items-center">
-                  <Tag className="h-4 w-4 mr-1" />
-                  <span>Kategori: <span className="font-medium">{news.category}</span></span>
-                </div>
+      </div>
+      
+      <div className="max-w-4xl space-y-6">
+        <ArgonCard title="Detail Informasi Berita">
+          {/* Metadata Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6 pb-6 border-b border-gray-150">
+            <div>
+              <span className="block text-xs font-bold uppercase text-slate-400 mb-1">Kategori</span>
+              {news.category ? (
+                <ArgonBadge variant="info">{news.category}</ArgonBadge>
+              ) : (
+                <span className="text-sm font-semibold text-slate-500">-</span>
               )}
-              <div className="flex items-center">
-                <Calendar className="h-4 w-4 mr-1" />
-                <span>Dipublikasikan: <span className="font-medium">
-                  {new Date(news.created_at).toLocaleDateString('id-ID', {
-                    day: 'numeric', month: 'long', year: 'numeric'
-                  })}
-                </span></span>
-              </div>
-              <div className="flex items-center">
-                <Clock className="h-4 w-4 mr-1" />
-                <span>Diperbarui: <span className="font-medium">
-                  {new Date(news.updated_at).toLocaleDateString('id-ID', {
-                    day: 'numeric', month: 'long', year: 'numeric'
-                  })}
-                </span></span>
-              </div>
-              <div className="flex items-center">
-                <User className="h-4 w-4 mr-1" />
-                <span>Oleh: <span className="font-medium">{news.user.name}</span></span>
-              </div>
-              <div className="flex items-center">
-                <Star className="h-4 w-4 mr-1" />
-                <span>Unggulan: <span className="font-medium">{news.is_featured ? 'Ya' : 'Tidak'}</span></span>
-              </div>
             </div>
-            
-            {news.image && (
-              <div className="aspect-video mb-6 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
-                <img 
-                  src={news.image} 
-                  alt={news.title}
-                  className="w-full h-full object-contain"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    e.currentTarget.nextElementSibling!.style.display = 'flex';
-                  }}
-                />
-                <ImagePlaceholder 
-                  width="100%" 
-                  height="100%" 
-                  className="hidden" 
-                />
-              </div>
-            )}
-            
-            {news.summary && (
-              <div className="my-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
-                <h2 className="text-xl font-semibold mb-2">Ringkasan</h2>
-                <p className="text-gray-700 italic">{news.summary}</p>
-              </div>
-            )}
-            
-            <div className="prose max-w-none mt-6">
-              <h2 className="text-xl font-semibold mb-4">Konten</h2>
-              <div 
-                className="text-gray-700" 
-                dangerouslySetInnerHTML={{ __html: news.content }}
-              />
+
+            <div>
+              <span className="block text-xs font-bold uppercase text-slate-400 mb-1">Penulis</span>
+              <span className="text-sm font-semibold text-slate-700 block mt-1">
+                <i className="fas fa-user mr-1.5 text-slate-400" />
+                {news.user.name}
+              </span>
+            </div>
+
+            <div>
+              <span className="block text-xs font-bold uppercase text-slate-400 mb-1">Tanggal Rilis</span>
+              <span className="text-sm font-semibold text-slate-700 block mt-1">
+                <i className="fas fa-calendar mr-1.5 text-slate-400" />
+                {new Date(news.created_at).toLocaleDateString('id-ID', {
+                  day: 'numeric', month: 'long', year: 'numeric'
+                })}
+              </span>
+            </div>
+
+            <div>
+              <span className="block text-xs font-bold uppercase text-slate-400 mb-1">Unggulan</span>
+              {news.is_featured ? (
+                <ArgonBadge variant="success" gradient>Ya</ArgonBadge>
+              ) : (
+                <ArgonBadge variant="default">Tidak</ArgonBadge>
+              )}
             </div>
           </div>
-        </div>
+
+          {/* Photo Display */}
+          {news.image && (
+            <div className="rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center p-4 border border-gray-100 max-h-[500px] mb-6">
+              <img 
+                src={news.image} 
+                alt={news.title}
+                className="w-full object-contain max-h-[460px] rounded-lg shadow-sm"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.nextElementSibling!.style.display = 'flex';
+                }}
+              />
+              <ImagePlaceholder 
+                width="100%" 
+                height="400px" 
+                className="hidden" 
+              />
+            </div>
+          )}
+          
+          {/* Summary / Ringkasan */}
+          {news.summary && (
+            <div className="mb-6 p-4 bg-orange-50/50 border-l-4 border-orange-500 rounded-lg">
+              <h6 className="text-orange-700 font-bold mb-1 text-sm">Ringkasan</h6>
+              <p className="text-slate-600 text-sm leading-relaxed italic">"{news.summary}"</p>
+            </div>
+          )}
+
+          {/* Content / Konten */}
+          <div className="mt-6 pt-6 border-t border-gray-150">
+            <h6 className="text-slate-700 font-bold mb-4 text-sm">Konten Lengkap</h6>
+            <div 
+              className="prose max-w-none text-slate-600 text-sm leading-relaxed" 
+              dangerouslySetInnerHTML={{ __html: news.content }}
+            />
+          </div>
+        </ArgonCard>
       </div>
     </AdminLayout>
   );

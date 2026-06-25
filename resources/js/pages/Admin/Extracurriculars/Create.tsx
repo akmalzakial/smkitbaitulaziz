@@ -1,11 +1,10 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, Save, X } from 'lucide-react';
 import AdminLayout from '@/layouts/AdminLayout';
+import ArgonCard from '@/components/admin/ArgonCard';
+import ArgonFormInput from '@/components/admin/ArgonFormInput';
 
-interface CreateProps { }
-
-export default function Create({ }: CreateProps) {
+export default function Create() {
   const { data, setData, post, processing, errors, reset } = useForm({
     name: '',
     description: '',
@@ -53,257 +52,212 @@ export default function Create({ }: CreateProps) {
     <AdminLayout>
       <Head title="Tambah Ekstrakurikuler" />
 
-      <div className="container px-6 mx-auto">
-        <div className="flex items-center justify-between py-4 mb-6">
-          <div className="flex items-center">
-            <Link
-              href={route('admin.extracurriculars.index')}
-              className="inline-flex items-center mr-4 text-white hover:text-gray-900"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <h1 className="text-2xl font-semibold text-white">Tambah Ekstrakurikuler Baru</h1>
+      {/* Header and Back Link */}
+      <div className="mb-6">
+        <Link
+          href={route('admin.extracurriculars.index')}
+          className="text-white hover:text-white/80 inline-flex items-center text-sm transition-colors"
+        >
+          <i className="fas fa-arrow-left mr-1.5" /> Kembali ke Daftar Ekstrakurikuler
+        </Link>
+        <h1 className="text-2xl font-bold text-white mt-2">Tambah Ekstrakurikuler Baru</h1>
+      </div>
+
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            <ArgonCard title="Informasi Dasar & Detail">
+              {/* Nama Ekstrakurikuler */}
+              <ArgonFormInput
+                label="Nama Ekstrakurikuler *"
+                type="text"
+                id="name"
+                value={data.name}
+                onChange={(e) => setData('name', e.target.value)}
+                error={errors.name}
+                placeholder="Contoh: Pramuka, Futsal, Rohis..."
+                icon="fas fa-heading"
+                required
+              />
+
+              {/* Deskripsi */}
+              <div className="mb-4">
+                <label htmlFor="description" className="block text-xs font-bold uppercase text-slate-400 mb-2">
+                  Deskripsi Lengkap
+                </label>
+                <textarea
+                  id="description"
+                  rows={5}
+                  value={data.description}
+                  onChange={(e) => setData('description', e.target.value)}
+                  className="text-sm w-full rounded-lg border border-solid border-gray-300 bg-white py-2 px-3 text-slate-700 focus:border-orange-500 focus:outline-none focus:shadow-primary-outline transition-all"
+                  placeholder="Jelaskan tentang kegiatan ekstrakurikuler ini, visi misi, atau prestasi..."
+                />
+                {errors.description && (
+                  <p className="mt-2 text-xs text-red-500 font-semibold">{errors.description}</p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                {/* Pembina */}
+                <ArgonFormInput
+                  label="Nama Pembina"
+                  type="text"
+                  id="coach"
+                  value={data.coach}
+                  onChange={(e) => setData('coach', e.target.value)}
+                  error={errors.coach}
+                  placeholder="Nama Lengkap Pembina"
+                  icon="fas fa-user-tie"
+                  wrapperClassName="mb-0"
+                />
+
+                {/* Lokasi */}
+                <ArgonFormInput
+                  label="Lokasi Latihan"
+                  type="text"
+                  id="location"
+                  value={data.location}
+                  onChange={(e) => setData('location', e.target.value)}
+                  error={errors.location}
+                  placeholder="Lapangan, Aula, Lab..."
+                  icon="fas fa-map-marker-alt"
+                  wrapperClassName="mb-0"
+                />
+              </div>
+
+              {/* Jadwal */}
+              <ArgonFormInput
+                label="Jadwal Kegiatan"
+                type="text"
+                id="schedule"
+                value={data.schedule}
+                onChange={(e) => setData('schedule', e.target.value)}
+                error={errors.schedule}
+                placeholder="Contoh: Setiap Hari Jumat, Pukul 14.00 - 16.00 WIB"
+                icon="fas fa-calendar-alt"
+                wrapperClassName="mt-4 mb-0"
+              />
+            </ArgonCard>
+          </div>
+
+          {/* Right Column - Sidebar */}
+          <div className="space-y-6">
+            {/* Logo / Foto Kegiatan */}
+            <ArgonCard title="Logo / Foto">
+              {!preview ? (
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex justify-center items-center flex-col cursor-pointer hover:border-orange-500 hover:bg-orange-500/5 transition-all duration-300 group bg-white">
+                  <label
+                    htmlFor="image"
+                    className="w-full flex flex-col items-center cursor-pointer"
+                  >
+                    <div className="p-3 rounded-full bg-orange-500/10 group-hover:bg-orange-500/20 transition-colors mb-3">
+                      <i className="fas fa-upload text-orange-500 text-lg" />
+                    </div>
+                    <p className="text-sm font-semibold text-slate-700 group-hover:text-orange-500 transition-colors text-center">
+                      Klik untuk unggah foto
+                    </p>
+                    <p className="text-xs text-slate-400 mt-1 text-center">
+                      Max 2MB (PNG/JPG/WebP)
+                    </p>
+                    <input
+                      id="image"
+                      name="image"
+                      type="file"
+                      className="hidden"
+                      onChange={handleImageChange}
+                      accept="image/*"
+                    />
+                  </label>
+                </div>
+              ) : (
+                <div className="relative group">
+                  <div className="relative rounded-xl overflow-hidden shadow-md ring-2 ring-orange-500/20 bg-white">
+                    <img
+                      src={preview}
+                      alt="Preview"
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="bg-red-600 hover:bg-red-700 text-white p-1.5 px-3 rounded-lg shadow-lg transition-transform transform hover:scale-105 flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
+                      >
+                        <i className="fas fa-trash text-xs" />
+                        Hapus
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {errors.image && (
+                <p className="mt-2 text-xs text-red-500 font-semibold flex items-center">
+                  <span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>
+                  {errors.image}
+                </p>
+              )}
+            </ArgonCard>
+
+            {/* Status */}
+            <ArgonCard title="Status">
+              <div className="mb-4">
+                <label htmlFor="is_active" className="block text-xs font-bold uppercase text-slate-400 mb-2">
+                  Status Aktivitas
+                </label>
+                <div className="relative flex flex-wrap items-stretch w-full transition-all rounded-lg ease">
+                  <span className="text-sm ease absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-3 text-center font-normal text-slate-500 transition-all leading-5">
+                    <i className="fas fa-info-circle" />
+                  </span>
+                  <select
+                    id="is_active"
+                    value={data.is_active ? '1' : '0'}
+                    onChange={(e) => {
+                      const isActive = e.target.value === '1';
+                      setData('is_active', isActive as any);
+                    }}
+                    className="text-sm w-full rounded-lg border border-solid border-gray-300 bg-white py-2 pr-3 pl-9 text-slate-700 focus:border-orange-500 focus:outline-none focus:shadow-primary-outline transition-all"
+                  >
+                    <option value="1">Aktif</option>
+                    <option value="0">Tidak Aktif</option>
+                  </select>
+                </div>
+              </div>
+              <p className="text-xxs text-slate-400">
+                Ekstrakurikuler yang tidak aktif tidak akan ditampilkan di halaman publik.
+              </p>
+            </ArgonCard>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Left Column - Main Content */}
-              <div className="lg:col-span-2 space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-100">Informasi Dasar</h3>
-
-                  {/* Nama Ekstrakurikuler */}
-                  <div className="mb-6">
-                    <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
-                      Nama Ekstrakurikuler <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      value={data.name}
-                      onChange={(e) => setData('name', e.target.value)}
-                      className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3 px-4 transition-all"
-                      placeholder="Contoh: Pramuka, Futsal, Rohis..."
-                      required
-                    />
-                    {errors.name && (
-                      <p className="mt-2 text-sm text-red-600 flex items-center">
-                        <span className="w-1 h-1 bg-red-600 rounded-full mr-2"></span>
-                        {errors.name}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Deskripsi */}
-                  <div className="mb-6">
-                    <label htmlFor="description" className="block text-sm font-semibold text-gray-700 mb-2">
-                      Deskripsi Lengkap
-                    </label>
-                    <textarea
-                      id="description"
-                      rows={6}
-                      value={data.description}
-                      onChange={(e) => setData('description', e.target.value)}
-                      className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3 px-4 transition-all"
-                      placeholder="Jelaskan tentang kegiatan ekstrakurikuler ini, visi misi, atau prestasi yang pernah diraih..."
-                    ></textarea>
-                    {errors.description && (
-                      <p className="mt-2 text-sm text-red-600 flex items-center">
-                        <span className="w-1 h-1 bg-red-600 rounded-full mr-2"></span>
-                        {errors.description}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="pt-2">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-100">Detail Kegiatan</h3>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Pembina */}
-                    <div>
-                      <label htmlFor="coach" className="block text-sm font-semibold text-gray-700 mb-2">
-                        Nama Pembina
-                      </label>
-                      <input
-                        type="text"
-                        id="coach"
-                        value={data.coach}
-                        onChange={(e) => setData('coach', e.target.value)}
-                        className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3 px-4 transition-all"
-                        placeholder="Nama Lengkap Pembina"
-                      />
-                      {errors.coach && (
-                        <p className="mt-2 text-sm text-red-600">{errors.coach}</p>
-                      )}
-                    </div>
-
-                    {/* Lokasi */}
-                    <div>
-                      <label htmlFor="location" className="block text-sm font-semibold text-gray-700 mb-2">
-                        Lokasi Latihan
-                      </label>
-                      <input
-                        type="text"
-                        id="location"
-                        value={data.location}
-                        onChange={(e) => setData('location', e.target.value)}
-                        className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3 px-4 transition-all"
-                        placeholder="Lapangan, Aula, Lab..."
-                      />
-                      {errors.location && (
-                        <p className="mt-2 text-sm text-red-600">{errors.location}</p>
-                      )}
-                    </div>
-
-                    {/* Jadwal */}
-                    <div className="md:col-span-2">
-                      <label htmlFor="schedule" className="block text-sm font-semibold text-gray-700 mb-2">
-                        Jadwal Kegiatan
-                      </label>
-                      <input
-                        type="text"
-                        id="schedule"
-                        value={data.schedule}
-                        onChange={(e) => setData('schedule', e.target.value)}
-                        className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3 px-4 transition-all"
-                        placeholder="Contoh: Setiap Hari Jumat, Pukul 14.00 - 16.00 WIB"
-                      />
-                      {errors.schedule && (
-                        <p className="mt-2 text-sm text-red-600">{errors.schedule}</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column - Sidebar (Image & Status) */}
-              <div className="space-y-6">
-                {/* Gambar */}
-                <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">
-                    Logo / Foto Kegiatan
-                  </label>
-
-                  {!preview ? (
-                    <div className="mt-1 border-2 border-dashed border-gray-300 rounded-xl p-8 flex justify-center items-center flex-col cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all duration-300 group bg-white">
-                      <label
-                        htmlFor="image"
-                        className="w-full flex flex-col items-center cursor-pointer"
-                      >
-                        <div className="p-3 rounded-full bg-blue-50 group-hover:bg-blue-100 transition-colors mb-3">
-                          <svg className="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                        </div>
-                        <p className="mt-1 text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors text-center">
-                          Klik untuk unggah foto
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1 text-center">
-                          PNG, JPG, GIF (Max 2MB)
-                        </p>
-                        <input
-                          id="image"
-                          name="image"
-                          type="file"
-                          className="hidden"
-                          onChange={handleImageChange}
-                          accept="image/*"
-                        />
-                      </label>
-                    </div>
-                  ) : (
-                    <div className="mt-1 relative group">
-                      <div className="relative rounded-xl overflow-hidden shadow-md ring-2 ring-blue-100 bg-white">
-                        <img
-                          src={preview}
-                          alt="Preview"
-                          className="w-full h-48 object-cover"
-                        />
-                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3 flex justify-end">
-                          <button
-                            type="button"
-                            onClick={removeImage}
-                            className="bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-lg shadow-lg transition-transform transform hover:scale-105 flex items-center gap-1.5 text-xs font-medium"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                            Hapus
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  {errors.image && (
-                    <p className="mt-2 text-sm text-red-600 flex items-center">
-                      <span className="w-1 h-1 bg-red-600 rounded-full mr-2"></span>
-                      {errors.image}
-                    </p>
-                  )}
-                </div>
-
-                {/* Status */}
-                <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                  <label htmlFor="is_active" className="block text-sm font-semibold text-gray-700 mb-3">
-                    Status Aktivitas
-                  </label>
-                  <div className="relative">
-                    <select
-                      id="is_active"
-                      value={data.is_active ? '1' : '0'}
-                      onChange={(e) => {
-                        const isActive = e.target.value === '1';
-                        setData('is_active', isActive as any);
-                      }}
-                      className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5 px-3 appearance-none bg-white"
-                    >
-                      <option value="1">Aktif</option>
-                      <option value="0">Tidak Aktif</option>
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
-                    </div>
-                  </div>
-                  <p className="mt-2 text-xs text-gray-500">
-                    Ekstrakurikuler yang tidak aktif tidak akan ditampilkan di halaman publik.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Form Actions */}
-            <div className="flex items-center justify-end space-x-4 pt-8 border-t border-gray-100 mt-8">
-              <Link
-                href={route('admin.extracurriculars.index')}
-                className="inline-flex justify-center py-2.5 px-6 border border-gray-300 shadow-sm text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-colors"
-              >
-                Batal
-              </Link>
-              <button
-                type="submit"
-                disabled={processing}
-                className={`inline-flex justify-center py-2.5 px-6 border border-transparent shadow-sm text-sm font-medium rounded-xl text-black bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all ${processing ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-md transform hover:-translate-y-0.5'}`}
-              >
-                {processing ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Menyimpan...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    Simpan Ekstrakurikuler
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
+        {/* Footer Actions */}
+        <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-100 mt-6">
+          <Link
+            href={route('admin.extracurriculars.index')}
+            className="px-4 py-2 text-xs font-bold uppercase text-slate-400 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg cursor-pointer transition-all duration-200"
+          >
+            Batal
+          </Link>
+          <button
+            type="submit"
+            disabled={processing}
+            className="inline-flex items-center px-4 py-2 bg-gradient-to-tl from-orange-500 to-yellow-500 text-white text-xs font-bold uppercase rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {processing ? (
+              <>
+                <i className="fas fa-spinner animate-spin mr-1.5" />
+                Menyimpan...
+              </>
+            ) : (
+              <>
+                <i className="fas fa-save mr-1.5" />
+                Simpan Ekstrakurikuler
+              </>
+            )}
+          </button>
         </div>
-      </div>
+      </form>
     </AdminLayout>
   );
-} 
+}

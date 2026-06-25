@@ -199,7 +199,7 @@ class PpdbAdminController extends Controller
             'catatan' => $validatedData['notes'] ?? $ppdb->catatan
         ]);
 
-        return redirect()->route('admin.ppdb.show', $ppdb->id)
+        return redirect()->route('admin.spmb.show', $ppdb->id)
             ->with('success', 'Status pendaftaran berhasil diupdate!');
     }
 
@@ -350,7 +350,7 @@ class PpdbAdminController extends Controller
         $settings->fill($validatedData);
         $settings->save();
 
-        return redirect()->route('admin.ppdb.settings')
+        return redirect()->route('admin.spmb.settings')
             ->with('success', 'Pengaturan PPDB berhasil disimpan!');
     }
 
@@ -395,6 +395,6 @@ class PpdbAdminController extends Controller
         // Hapus data pendaftaran
         $ppdb->delete();
         
-        return redirect()->route('admin.ppdb.index')->with('success', 'Data pendaftaran berhasil dihapus.');
+        return redirect()->route('admin.spmb.index')->with('success', 'Data pendaftaran berhasil dihapus.');
     }
 }

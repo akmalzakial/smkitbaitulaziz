@@ -7,7 +7,7 @@ Website resmi untuk SMK IT Baitul Aziz.
 - Informasi sekolah
 - Berita & pengumuman
 - Galeri foto
-- PPDB
+- SPMB
 - Kontak
 - Admin Dashboard
 

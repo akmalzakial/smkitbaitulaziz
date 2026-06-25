@@ -36,6 +36,7 @@ Route::get('/gallery', [HomeController::class, 'gallery'])->name('gallery');
 Route::get('/berita', [HomeController::class, 'news'])->name('news');
 Route::get('/berita/{slug}', [HomeController::class, 'newsDetail'])->name('news.detail');
 Route::get('/kontak', [HomeController::class, 'contact'])->name('contact');
+Route::post('/kontak', [HomeController::class, 'submitContact'])->name('contact.submit');
 
 // Ekstrakurikuler routes
 Route::get('/ekstrakurikuler', [ExtracurricularController::class, 'index'])->name('extracurricular');
@@ -44,22 +45,18 @@ Route::get('/ekstrakurikuler/{slug}', [ExtracurricularController::class, 'show']
 // Struktur Organisasi routes
 Route::get('/struktur-organisasi', [StrukturController::class, 'index'])->name('struktur.index');
 
-// PPDB routes
-Route::get('/ppdb', [PpdbController::class, 'index'])->name('ppdb.index');
-Route::get('/ppdb/pendaftaran', [PpdbController::class, 'create'])->name('ppdb.create');
-Route::post('/ppdb/pendaftaran', [PpdbController::class, 'store'])->name('ppdb.store');
-Route::get('/ppdb/status', [PpdbController::class, 'status'])->name('ppdb.status');
-Route::get('/ppdb/{ppdb}', [PpdbController::class, 'show'])->name('ppdb.show');
-Route::get('/ppdb/{ppdb}/cetak', [PpdbController::class, 'print'])->name('ppdb.print');
-Route::get('/ppdb/{ppdb}/edit', [PpdbController::class, 'edit'])->name('ppdb.edit');
-Route::post('/ppdb/pendaftaran/{ppdb}/update', [PpdbController::class, 'update'])->name('ppdb.update');
+// SPMB routes
+Route::get('/spmb', [PpdbController::class, 'index'])->name('spmb.index');
+Route::get('/spmb/pendaftaran', [PpdbController::class, 'create'])->name('spmb.create');
+Route::post('/spmb/pendaftaran', [PpdbController::class, 'store'])->name('spmb.store');
+Route::get('/spmb/status', [PpdbController::class, 'status'])->name('spmb.status');
+Route::get('/spmb/{ppdb}', [PpdbController::class, 'show'])->name('spmb.show');
+Route::get('/spmb/{ppdb}/cetak', [PpdbController::class, 'print'])->name('spmb.print');
+Route::get('/spmb/{ppdb}/edit', [PpdbController::class, 'edit'])->name('spmb.edit');
+Route::post('/spmb/pendaftaran/{ppdb}/update', [PpdbController::class, 'update'])->name('spmb.update');
 
-// Authentication routes
-Route::middleware('auth')->group(function () {
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile/destroy', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+// Settings routes
+require __DIR__.'/settings.php';
 
 // Admin routes
 Route::prefix('admin')->middleware(['auth', AdminMiddleware::class])->group(function () {
@@ -98,16 +95,16 @@ Route::prefix('admin')->middleware(['auth', AdminMiddleware::class])->group(func
         'destroy' => 'admin.extracurriculars.destroy',
     ]);
     
-    // PPDB management
-    Route::get('/ppdb', [PpdbAdminController::class, 'index'])->name('admin.ppdb.index');
-    Route::get('/ppdb/dashboard', [PpdbAdminController::class, 'dashboard'])->name('admin.ppdb.dashboard');
-    Route::get('/ppdb/settings', [PpdbAdminController::class, 'settings'])->name('admin.ppdb.settings');
-    Route::put('/ppdb/settings', [PpdbAdminController::class, 'updateSettings'])->name('admin.ppdb.settings.update');
-    Route::get('/ppdb/export', [PpdbAdminController::class, 'export'])->name('admin.ppdb.export');
-    Route::get('/ppdb/{ppdb}', [PpdbAdminController::class, 'show'])->name('admin.ppdb.show');
-    Route::put('/ppdb/{ppdb}/status', [PpdbAdminController::class, 'updateStatus'])->name('admin.ppdb.update-status');
-    Route::get('/ppdb/{ppdb}/cetak', [PpdbAdminController::class, 'print'])->name('admin.ppdb.print');
-    Route::delete('/ppdb/{ppdb}', [PpdbAdminController::class, 'destroy'])->name('admin.ppdb.destroy');
+    // SPMB management
+    Route::get('/spmb', [PpdbAdminController::class, 'index'])->name('admin.spmb.index');
+    Route::get('/spmb/dashboard', [PpdbAdminController::class, 'dashboard'])->name('admin.spmb.dashboard');
+    Route::get('/spmb/settings', [PpdbAdminController::class, 'settings'])->name('admin.spmb.settings');
+    Route::put('/spmb/settings', [PpdbAdminController::class, 'updateSettings'])->name('admin.spmb.settings.update');
+    Route::get('/spmb/export', [PpdbAdminController::class, 'export'])->name('admin.spmb.export');
+    Route::get('/spmb/{ppdb}', [PpdbAdminController::class, 'show'])->name('admin.spmb.show');
+    Route::put('/spmb/{ppdb}/status', [PpdbAdminController::class, 'updateStatus'])->name('admin.spmb.update-status');
+    Route::get('/spmb/{ppdb}/cetak', [PpdbAdminController::class, 'print'])->name('admin.spmb.print');
+    Route::delete('/spmb/{ppdb}', [PpdbAdminController::class, 'destroy'])->name('admin.spmb.destroy');
     
     // User management
     Route::resource('users', UserController::class)->names([
@@ -130,6 +127,16 @@ Route::prefix('admin')->middleware(['auth', AdminMiddleware::class])->group(func
         'update' => 'admin.teachers.update',
         'destroy' => 'admin.teachers.destroy',
     ]);
+
+    // Contact settings management
+    Route::get('/contact', [\App\Http\Controllers\Admin\ContactAdminController::class, 'index'])->name('admin.contact.index');
+    Route::put('/contact', [\App\Http\Controllers\Admin\ContactAdminController::class, 'update'])->name('admin.contact.update');
+
+    // Message/Inbox management
+    Route::get('/messages', [\App\Http\Controllers\Admin\ContactAdminController::class, 'messagesIndex'])->name('admin.messages.index');
+    Route::get('/messages/{message}', [\App\Http\Controllers\Admin\ContactAdminController::class, 'messagesShow'])->name('admin.messages.show');
+    Route::put('/messages/{message}/read', [\App\Http\Controllers\Admin\ContactAdminController::class, 'messagesMarkAsRead'])->name('admin.messages.read');
+    Route::delete('/messages/{message}', [\App\Http\Controllers\Admin\ContactAdminController::class, 'messagesDestroy'])->name('admin.messages.destroy');
 });
 
 require __DIR__.'/auth.php';

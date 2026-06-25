@@ -1,7 +1,8 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import AdminLayout from '@/layouts/AdminLayout';
+import ArgonCard from '@/components/admin/ArgonCard';
+import ArgonBadge from '@/components/admin/ArgonBadge';
 
 interface User {
   id: number;
@@ -46,171 +47,186 @@ export default function Show({ extracurricular }: ShowProps) {
     <AdminLayout>
       <Head title={`Detail Ekstrakurikuler - ${extracurricular.name}`} />
 
-      <div className="container px-6 mx-auto">
-        <div className="flex items-center justify-between py-4 mb-6">
-          <div className="flex items-center">
-            <Link
-              href={route('admin.extracurriculars.index')}
-              className="inline-flex items-center mr-4 text-gray-600 hover:text-gray-900"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <h1 className="text-2xl font-semibold text-gray-900">Detail Ekstrakurikuler</h1>
+      {/* Header and Back Link */}
+      <div className="mb-6">
+        <Link
+          href={route('admin.extracurriculars.index')}
+          className="text-white hover:text-white/80 inline-flex items-center text-sm transition-colors mb-4"
+        >
+          <i className="fas fa-arrow-left mr-1.5" /> Kembali ke Daftar Ekstrakurikuler
+        </Link>
+
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-white mb-1">
+              Detail Ekstrakurikuler: {extracurricular.name}
+            </h1>
+            <p className="text-white/80 text-sm">
+              Informasi lengkap kegiatan ekstrakurikuler SMK IT Baitul Aziz.
+            </p>
           </div>
-          <div className="flex space-x-2">
+          
+          <div className="flex items-center gap-2">
             <Link
               href={route('admin.extracurriculars.edit', extracurricular.id)}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-block px-4 py-2 bg-gradient-to-tl from-orange-500 to-yellow-500 text-white text-xs font-bold uppercase rounded-lg shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-px text-center"
             >
-              <Edit className="w-4 h-4 mr-2" />
-              Edit
+              <i className="fas fa-edit mr-1.5" /> Edit
             </Link>
             <Link
               href={route('admin.extracurriculars.destroy', extracurricular.id)}
               method="delete"
               as="button"
               type="button"
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              className="inline-block px-4 py-2 bg-gradient-to-tl from-red-600 to-orange-600 text-white text-xs font-bold uppercase rounded-lg shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-px text-center"
             >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Hapus
+              <i className="fas fa-trash-alt mr-1.5" /> Hapus
             </Link>
           </div>
         </div>
+      </div>
 
-        <div className="bg-white overflow-hidden shadow-md rounded-lg">
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="md:col-span-1">
-                {extracurricular.image ? (
-                  <div className="mb-6">
-                    <img
-                      src={`/storage/${extracurricular.image}`}
-                      alt={extracurricular.name}
-                      className="w-full h-auto rounded-md"
-                    />
-                  </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column: Image & Details */}
+        <div className="lg:col-span-1 space-y-6">
+          <ArgonCard title="Poster / Gambar">
+            {extracurricular.image ? (
+              <div className="rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center p-2 border border-gray-100 mb-4">
+                <img
+                  src={`/storage/${extracurricular.image}`}
+                  alt={extracurricular.name}
+                  className="w-full h-auto rounded-lg shadow-sm max-h-[300px] object-cover"
+                />
+              </div>
+            ) : (
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-6 text-center text-slate-400 mb-4">
+                <i className="fas fa-image text-3xl mb-2 text-slate-300" />
+                <p className="text-xs">Tidak ada gambar poster</p>
+              </div>
+            )}
+
+            <hr className="h-px bg-gray-200 my-4" />
+
+            <div className="space-y-3">
+              <div>
+                <span className="block text-xs font-bold uppercase text-slate-400 mb-1">Status</span>
+                {extracurricular.is_active ? (
+                  <ArgonBadge variant="success" gradient>Aktif</ArgonBadge>
                 ) : (
-                  <div className="mb-6 bg-gray-200 rounded-md p-4 flex items-center justify-center h-64">
-                    <span className="text-gray-500">Tidak ada gambar</span>
-                  </div>
+                  <ArgonBadge variant="danger" gradient>Tidak Aktif</ArgonBadge>
                 )}
-
-                <div className="mb-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Informasi Tambahan</h3>
-                  <div className="bg-gray-50 p-4 rounded-md">
-                    <dl className="divide-y divide-gray-200">
-                      <div className="py-2 flex justify-between">
-                        <dt className="text-sm font-medium text-gray-500">Status</dt>
-                        <dd className="text-sm font-medium">
-                          {extracurricular.is_active ? (
-                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                              Aktif
-                            </span>
-                          ) : (
-                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                              Tidak Aktif
-                            </span>
-                          )}
-                        </dd>
-                      </div>
-                      <div className="py-2 flex justify-between">
-                        <dt className="text-sm font-medium text-gray-500">Urutan</dt>
-                        <dd className="text-sm font-medium text-gray-900">{extracurricular.order}</dd>
-                      </div>
-                      <div className="py-2 flex justify-between">
-                        <dt className="text-sm font-medium text-gray-500">Slug</dt>
-                        <dd className="text-sm font-medium text-gray-900">{extracurricular.slug}</dd>
-                      </div>
-                      <div className="py-2 flex justify-between">
-                        <dt className="text-sm font-medium text-gray-500">Dibuat pada</dt>
-                        <dd className="text-sm font-medium text-gray-900">
-                          {formatDate(extracurricular.created_at)}
-                        </dd>
-                      </div>
-                      <div className="py-2 flex justify-between">
-                        <dt className="text-sm font-medium text-gray-500">Diperbarui pada</dt>
-                        <dd className="text-sm font-medium text-gray-900">
-                          {formatDate(extracurricular.updated_at)}
-                        </dd>
-                      </div>
-                      {extracurricular.user && (
-                        <div className="py-2 flex justify-between">
-                          <dt className="text-sm font-medium text-gray-500">Dibuat oleh</dt>
-                          <dd className="text-sm font-medium text-gray-900">
-                            {extracurricular.user.name}
-                          </dd>
-                        </div>
-                      )}
-                    </dl>
-                  </div>
-                </div>
               </div>
 
-              <div className="md:col-span-2">
-                <div className="mb-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-2">{extracurricular.name}</h2>
-                  <div className="flex flex-wrap gap-4 mb-4">
-                    {extracurricular.schedule && (
-                      <div className="text-sm text-gray-700 flex items-center">
-                        <span className="font-medium mr-2">Jadwal:</span>
-                        {extracurricular.schedule}
-                      </div>
-                    )}
-                    {extracurricular.coach && (
-                      <div className="text-sm text-gray-700 flex items-center">
-                        <span className="font-medium mr-2">Pembina:</span>
-                        {extracurricular.coach}
-                      </div>
-                    )}
-                    {extracurricular.location && (
-                      <div className="text-sm text-gray-700 flex items-center">
-                        <span className="font-medium mr-2">Lokasi:</span>
-                        {extracurricular.location}
-                      </div>
-                    )}
-                  </div>
-                </div>
+              <div>
+                <span className="block text-xs font-bold uppercase text-slate-400 mb-0.5">Urutan Tampilan</span>
+                <span className="text-sm font-semibold text-slate-700">{extracurricular.order}</span>
+              </div>
 
+              <div>
+                <span className="block text-xs font-bold uppercase text-slate-400 mb-0.5">Slug URL</span>
+                <code className="text-xs font-mono bg-slate-50 px-2 py-1 rounded text-orange-600 font-semibold break-all inline-block">
+                  {extracurricular.slug}
+                </code>
+              </div>
+
+              <div>
+                <span className="block text-xs font-bold uppercase text-slate-400 mb-0.5">Dibuat</span>
+                <span className="text-xs font-semibold text-slate-700 block">
+                  <i className="far fa-clock mr-1 text-slate-400" />
+                  {formatDate(extracurricular.created_at)}
+                </span>
+              </div>
+
+              <div>
+                <span className="block text-xs font-bold uppercase text-slate-400 mb-0.5">Terakhir Diperbarui</span>
+                <span className="text-xs font-semibold text-slate-700 block">
+                  <i className="far fa-edit mr-1 text-slate-400" />
+                  {formatDate(extracurricular.updated_at)}
+                </span>
+              </div>
+
+              {extracurricular.user && (
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Deskripsi</h3>
-                  {extracurricular.description ? (
-                    <div className="prose max-w-none">
-                      <p className="text-gray-700 whitespace-pre-line">{extracurricular.description}</p>
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 italic">Tidak ada deskripsi</p>
-                  )}
+                  <span className="block text-xs font-bold uppercase text-slate-400 mb-0.5">Oleh</span>
+                  <span className="text-xs font-semibold text-slate-700 block">
+                    <i className="far fa-user mr-1 text-slate-400" />
+                    {extracurricular.user.name}
+                  </span>
                 </div>
+              )}
+            </div>
+          </ArgonCard>
+        </div>
 
-                <div className="mt-8">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-medium text-gray-900">Link Terkait</h3>
+        {/* Right Column: Info & Description */}
+        <div className="lg:col-span-2 space-y-6">
+          <ArgonCard title="Informasi Kegiatan">
+            {/* Quick Metadata Info */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100 mb-6">
+              <div>
+                <span className="block text-[10px] font-bold uppercase text-slate-400 mb-0.5">Jadwal Latihan</span>
+                <span className="text-xs font-bold text-slate-700 flex items-center">
+                  <i className="fas fa-calendar-alt mr-1.5 text-orange-500 text-[10px]" />
+                  {extracurricular.schedule || '-'}
+                </span>
+              </div>
+              <div>
+                <span className="block text-[10px] font-bold uppercase text-slate-400 mb-0.5">Pembina / Pelatih</span>
+                <span className="text-xs font-bold text-slate-700 flex items-center">
+                  <i className="fas fa-user-tie mr-1.5 text-orange-500 text-[10px]" />
+                  {extracurricular.coach || '-'}
+                </span>
+              </div>
+              <div>
+                <span className="block text-[10px] font-bold uppercase text-slate-400 mb-0.5">Lokasi Kegiatan</span>
+                <span className="text-xs font-bold text-slate-700 flex items-center">
+                  <i className="fas fa-map-marker-alt mr-1.5 text-orange-500 text-[10px]" />
+                  {extracurricular.location || '-'}
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <h6 className="text-slate-700 font-bold mb-2 text-sm">Deskripsi Kegiatan</h6>
+                {extracurricular.description ? (
+                  <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line bg-white p-4 rounded-lg border border-slate-100">
+                    {extracurricular.description}
+                  </p>
+                ) : (
+                  <p className="text-slate-400 italic text-xs">Tidak ada deskripsi yang ditambahkan.</p>
+                )}
+              </div>
+
+              <hr className="h-px bg-gray-200 my-6" />
+
+              <div>
+                <h6 className="text-slate-700 font-bold mb-3 text-sm">Link Publik Terkait</h6>
+                <div className="space-y-2">
+                  <div>
+                    <Link
+                      href={route('extracurricular')}
+                      className="text-sm font-semibold text-orange-500 hover:text-orange-600 transition-colors inline-flex items-center"
+                      target="_blank"
+                    >
+                      <i className="fas fa-external-link-alt mr-2 text-xs" />
+                      Lihat semua ekstrakurikuler di halaman publik →
+                    </Link>
                   </div>
-                  <div className="space-y-2">
-                    <div>
-                      <Link
-                        href={route('extracurricular')}
-                        className="text-blue-600 hover:text-blue-800 hover:underline"
-                        target="_blank"
-                      >
-                        Lihat semua ekstrakurikuler di halaman publik →
-                      </Link>
-                    </div>
-                    <div>
-                      <Link
-                        href={route('extracurricular.detail', extracurricular.slug)}
-                        className="text-blue-600 hover:text-blue-800 hover:underline"
-                        target="_blank"
-                      >
-                        Lihat detail ekstrakurikuler ini di halaman publik →
-                      </Link>
-                    </div>
+                  <div>
+                    <Link
+                      href={route('extracurricular.detail', extracurricular.slug)}
+                      className="text-sm font-semibold text-orange-500 hover:text-orange-600 transition-colors inline-flex items-center"
+                      target="_blank"
+                    >
+                      <i className="fas fa-external-link-alt mr-2 text-xs" />
+                      Lihat detail ekstrakurikuler ini di halaman publik →
+                    </Link>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </ArgonCard>
         </div>
       </div>
     </AdminLayout>

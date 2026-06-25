@@ -1,6 +1,8 @@
 import React from 'react';
 import { Head, useForm, Link } from '@inertiajs/react';
-import AdminLayout from '../../../layouts/AdminLayout';
+import AdminLayout from '@/layouts/AdminLayout';
+import ArgonCard from '@/components/admin/ArgonCard';
+import ArgonFormInput from '@/components/admin/ArgonFormInput';
 
 interface PpdbSettingsProps {
     settings: {
@@ -24,196 +26,151 @@ export default function PpdbSettings({ settings }: PpdbSettingsProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put('/admin/ppdb/settings');
+        put('/admin/spmb/settings');
     };
 
     return (
         <AdminLayout>
-            <Head title="Pengaturan PPDB" />
+            <Head title="Pengaturan SPMB" />
 
             {/* Header Card */}
-            <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border mb-6">
-                <div className="flex-auto p-6">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className="inline-block w-12 h-12 text-center rounded-lg bg-gradient-to-tl from-orange-500 to-orange-600">
-                                <i className="ni ni-settings-gear-65 text-lg text-white relative top-3"></i>
-                            </div>
-                            <div>
-                                <h5 className="mb-1 font-bold text-slate-700">Pengaturan PPDB</h5>
-                                <p className="mb-0 text-sm text-slate-500">Atur jadwal pembukaan dan penutupan pendaftaran PPDB</p>
-                            </div>
-                        </div>
-                        <Link
-                            href="/admin/ppdb"
-                            className="inline-block px-4 py-2 text-xs font-bold text-center uppercase align-middle transition-all rounded-lg cursor-pointer bg-slate-100 text-slate-700 hover:bg-slate-200"
-                        >
-                            <i className="fas fa-arrow-left mr-2"></i>
-                            Kembali
-                        </Link>
-                    </div>
-                </div>
+            <div className="mb-6">
+                <Link
+                    href="/admin/spmb"
+                    className="text-white hover:text-white/80 inline-flex items-center text-sm transition-colors mb-4"
+                >
+                    <i className="fas fa-arrow-left mr-1.5" /> Kembali
+                </Link>
+                <h1 className="text-2xl font-bold text-white mb-1">Pengaturan SPMB</h1>
+                <p className="text-white/80 text-sm">Atur jadwal pembukaan dan penutupan pendaftaran SPMB SMK IT Baitul Aziz.</p>
             </div>
 
             {/* Form Card */}
-            <div className="relative flex flex-col min-w-0 break-words bg-white shadow-xl rounded-2xl bg-clip-border">
-                <div className="p-6 border-b border-slate-100">
-                    <h6 className="mb-0 text-slate-700 font-semibold">Konfigurasi PPDB</h6>
-                </div>
-
-                <form onSubmit={handleSubmit} className="p-6">
-                    {/* Toggle Status */}
-                    <div className="flex items-center justify-between p-4 mb-6 rounded-xl" style={{ backgroundColor: '#f8fafc' }}>
-                        <div>
-                            <h6 className="mb-1 font-semibold text-slate-700">Status Pendaftaran PPDB</h6>
-                            <p className="mb-0 text-sm text-slate-500">
-                                {data.is_open ? 'Pendaftaran sedang dibuka' : 'Pendaftaran sedang ditutup'}
-                            </p>
+            <div className="max-w-3xl">
+                <form onSubmit={handleSubmit}>
+                    <ArgonCard 
+                        title="Konfigurasi SPMB"
+                        footer={
+                            <div className="flex justify-end w-full">
+                                <button
+                                    type="submit"
+                                    disabled={processing}
+                                    className="inline-flex items-center px-4 py-2 bg-gradient-to-tl from-orange-500 to-yellow-500 text-white text-xs font-bold uppercase rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <i className="fas fa-save mr-2"></i>
+                                    {processing ? 'Menyimpan...' : 'Simpan Pengaturan'}
+                                </button>
+                            </div>
+                        }
+                    >
+                        {/* Toggle Status */}
+                        <div className="flex items-center justify-between p-4 mb-6 rounded-xl bg-gray-50 border border-gray-150">
+                            <div>
+                                <h6 className="mb-0 text-sm font-semibold text-slate-700">Status Pendaftaran SPMB</h6>
+                                <p className="mb-0 text-xs text-slate-400">
+                                    {data.is_open ? 'Pendaftaran sedang dibuka' : 'Pendaftaran sedang ditutup'}
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setData('is_open', !data.is_open)}
+                                className={`w-14 h-8 rounded-full relative cursor-pointer border-none transition-all duration-300 ${
+                                    data.is_open ? 'bg-orange-500' : 'bg-slate-300'
+                                }`}
+                            >
+                                <span
+                                    className={`w-6 h-6 rounded-full bg-white absolute top-1 shadow-md transition-all duration-300 ${
+                                        data.is_open ? 'left-7' : 'left-1'
+                                    }`}
+                                />
+                            </button>
                         </div>
-                        <button
-                            type="button"
-                            onClick={() => setData('is_open', !data.is_open)}
-                            style={{
-                                width: '56px',
-                                height: '32px',
-                                borderRadius: '16px',
-                                backgroundColor: data.is_open ? '#f97316' : '#cbd5e1',
-                                position: 'relative',
-                                cursor: 'pointer',
-                                border: 'none',
-                                transition: 'background-color 0.3s ease',
-                            }}
-                        >
-                            <span
-                                style={{
-                                    width: '24px',
-                                    height: '24px',
-                                    borderRadius: '50%',
-                                    backgroundColor: '#ffffff',
-                                    position: 'absolute',
-                                    top: '4px',
-                                    left: data.is_open ? '28px' : '4px',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                                    transition: 'left 0.3s ease',
-                                }}
-                            />
-                        </button>
-                    </div>
 
-                    {/* Academic Year */}
-                    <div className="mb-6">
-                        <label className="block mb-2 text-sm font-medium text-slate-700">
-                            Tahun Ajaran
-                        </label>
-                        <input
+                        {/* Academic Year */}
+                        <ArgonFormInput
+                            label="Tahun Ajaran"
                             type="text"
                             value={data.academic_year}
                             onChange={(e) => setData('academic_year', e.target.value)}
+                            error={errors.academic_year}
                             placeholder="2025/2026"
-                            className="block w-full px-4 py-3 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg focus:border-orange-500 focus:outline-none"
-                            style={{ backgroundColor: '#ffffff', color: '#334155' }}
+                            icon="fas fa-graduation-cap"
                         />
-                        {errors.academic_year && (
-                            <p className="mt-1 text-sm text-red-600">{errors.academic_year}</p>
-                        )}
-                    </div>
 
-                    {/* Dates */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label className="block mb-2 text-sm font-medium text-slate-700">
-                                <i className="fas fa-calendar-alt mr-2 text-orange-500"></i>
-                                Tanggal Pembukaan
-                            </label>
-                            <input
-                                type="date"
-                                value={data.open_date}
-                                onChange={(e) => setData('open_date', e.target.value)}
-                                className="block w-full px-4 py-3 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg focus:border-orange-500 focus:outline-none"
-                                style={{ backgroundColor: '#ffffff', color: '#334155' }}
-                            />
-                            {errors.open_date && (
-                                <p className="mt-1 text-sm text-red-600">{errors.open_date}</p>
-                            )}
+                        {/* Dates */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                            <div>
+                                <label className="block text-xs font-bold uppercase text-slate-400 mb-2">
+                                    Tanggal Pembukaan
+                                </label>
+                                <div className="relative flex flex-wrap items-stretch w-full transition-all rounded-lg ease">
+                                    <span className="text-sm ease absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-3 text-center font-normal text-slate-500 transition-all leading-5">
+                                        <i className="fas fa-calendar-alt" />
+                                    </span>
+                                    <input
+                                        type="date"
+                                        value={data.open_date}
+                                        onChange={(e) => setData('open_date', e.target.value)}
+                                        className="text-sm w-full rounded-lg border border-solid border-gray-300 bg-white py-2 pr-3 pl-9 text-slate-700 focus:border-orange-500 focus:outline-none focus:shadow-primary-outline transition-all"
+                                    />
+                                </div>
+                                {errors.open_date && (
+                                    <p className="mt-1 text-xs text-red-500 font-semibold">{errors.open_date}</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold uppercase text-slate-400 mb-2">
+                                    Tanggal Penutupan
+                                </label>
+                                <div className="relative flex flex-wrap items-stretch w-full transition-all rounded-lg ease">
+                                    <span className="text-sm ease absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-3 text-center font-normal text-slate-500 transition-all leading-5">
+                                        <i className="fas fa-calendar-alt" />
+                                    </span>
+                                    <input
+                                        type="date"
+                                        value={data.close_date}
+                                        onChange={(e) => setData('close_date', e.target.value)}
+                                        className="text-sm w-full rounded-lg border border-solid border-gray-300 bg-white py-2 pr-3 pl-9 text-slate-700 focus:border-orange-500 focus:outline-none focus:shadow-primary-outline transition-all"
+                                    />
+                                </div>
+                                {errors.close_date && (
+                                    <p className="mt-1 text-xs text-red-500 font-semibold">{errors.close_date}</p>
+                                )}
+                            </div>
                         </div>
 
-                        <div>
-                            <label className="block mb-2 text-sm font-medium text-slate-700">
-                                <i className="fas fa-calendar-alt mr-2 text-orange-500"></i>
-                                Tanggal Penutupan
+                        {/* Closed Message */}
+                        <div className="mb-4">
+                            <label className="block text-xs font-bold uppercase text-slate-400 mb-2">
+                                Pesan Saat SPMB Ditutup
                             </label>
-                            <input
-                                type="date"
-                                value={data.close_date}
-                                onChange={(e) => setData('close_date', e.target.value)}
-                                className="block w-full px-4 py-3 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg focus:border-orange-500 focus:outline-none"
-                                style={{ backgroundColor: '#ffffff', color: '#334155' }}
+                            <textarea
+                                value={data.message_closed}
+                                onChange={(e) => setData('message_closed', e.target.value)}
+                                rows={3}
+                                placeholder="Masukkan pesan yang akan ditampilkan saat pendaftaran ditutup..."
+                                className="text-sm w-full rounded-lg border border-solid border-gray-300 bg-white py-2 px-3 text-slate-700 focus:border-orange-500 focus:outline-none focus:shadow-primary-outline transition-all resize-none"
                             />
-                            {errors.close_date && (
-                                <p className="mt-1 text-sm text-red-600">{errors.close_date}</p>
+                            {errors.message_closed && (
+                                <p className="mt-1 text-xs text-red-500 font-semibold">{errors.message_closed}</p>
                             )}
                         </div>
-                    </div>
-
-                    {/* Closed Message */}
-                    <div className="mb-6">
-                        <label className="block mb-2 text-sm font-medium text-slate-700">
-                            Pesan Saat PPDB Ditutup
-                        </label>
-                        <textarea
-                            value={data.message_closed}
-                            onChange={(e) => setData('message_closed', e.target.value)}
-                            rows={3}
-                            placeholder="Masukkan pesan yang akan ditampilkan saat pendaftaran ditutup..."
-                            className="block w-full px-4 py-3 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg focus:border-orange-500 focus:outline-none resize-none"
-                            style={{ backgroundColor: '#ffffff', color: '#334155' }}
-                        />
-                        {errors.message_closed && (
-                            <p className="mt-1 text-sm text-red-600">{errors.message_closed}</p>
-                        )}
-                    </div>
-
-                    {/* Submit Button */}
-                    <div className="flex justify-end pt-4 border-t border-slate-100">
-                        <button
-                            type="submit"
-                            disabled={processing}
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                padding: '12px 24px',
-                                backgroundColor: '#f97316',
-                                color: '#ffffff',
-                                fontWeight: '600',
-                                fontSize: '14px',
-                                borderRadius: '8px',
-                                border: 'none',
-                                cursor: processing ? 'not-allowed' : 'pointer',
-                                opacity: processing ? 0.6 : 1,
-                                transition: 'background-color 0.2s ease',
-                            }}
-                            onMouseOver={(e) => !processing && (e.currentTarget.style.backgroundColor = '#ea580c')}
-                            onMouseOut={(e) => !processing && (e.currentTarget.style.backgroundColor = '#f97316')}
-                        >
-                            <i className="fas fa-save mr-2"></i>
-                            {processing ? 'Menyimpan...' : 'Simpan Pengaturan'}
-                        </button>
-                    </div>
+                    </ArgonCard>
                 </form>
-            </div>
 
-            {/* Info Card */}
-            <div className="relative flex flex-col min-w-0 break-words bg-blue-50 border border-blue-200 rounded-2xl bg-clip-border mt-6 p-4">
-                <h6 className="font-semibold text-blue-800 mb-2">
-                    <i className="fas fa-info-circle mr-2"></i>
-                    Informasi
-                </h6>
-                <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
-                    <li>Jika <strong>Status Pendaftaran</strong> dimatikan, pendaftar tidak dapat mengakses form pendaftaran.</li>
-                    <li><strong>Tanggal Pembukaan</strong> dan <strong>Penutupan</strong> bersifat opsional.</li>
-                    <li><strong>Pesan Saat Ditutup</strong> akan ditampilkan kepada calon pendaftar ketika pendaftaran tidak aktif.</li>
-                </ul>
+                {/* Info Card */}
+                <div className="relative flex flex-col min-w-0 break-words bg-blue-500/10 border border-blue-200 rounded-2xl bg-clip-border mt-6 p-5">
+                    <h6 className="font-bold text-blue-700 mb-2 text-sm">
+                        <i className="fas fa-info-circle mr-1.5"></i>
+                        Informasi Penting
+                    </h6>
+                    <ul className="text-xs text-blue-700 space-y-1.5 list-disc list-inside">
+                        <li>Jika <strong>Status Pendaftaran</strong> dinonaktifkan, calon siswa tidak dapat mengakses form pendaftaran.</li>
+                        <li><strong>Tanggal Pembukaan</strong> dan <strong>Penutupan</strong> pendaftaran bersifat opsional.</li>
+                        <li><strong>Pesan Saat Ditutup</strong> akan muncul di halaman pendaftaran ketika status pendaftaran tidak aktif.</li>
+                    </ul>
+                </div>
             </div>
         </AdminLayout>
     );
