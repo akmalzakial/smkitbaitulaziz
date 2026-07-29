@@ -22,6 +22,7 @@ class Gallery extends Model
         'category',
         'is_featured',
         'user_id',
+        'news_id',
     ];
 
     /**
@@ -39,5 +40,13 @@ class Gallery extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the news that owns the gallery item.
+     */
+    public function news(): BelongsTo
+    {
+        return $this->belongsTo(News::class);
     }
 }

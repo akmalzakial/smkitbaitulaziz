@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class News extends Model
 {
@@ -61,5 +62,13 @@ class News extends Model
     public function author(): BelongsTo
     {
         return $this->user();
+    }
+
+    /**
+     * Get the gallery items associated with the news.
+     */
+    public function galleries(): HasMany
+    {
+        return $this->hasMany(Gallery::class);
     }
 }

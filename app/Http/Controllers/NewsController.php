@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\News;
+use App\Models\Gallery;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -46,7 +47,8 @@ class NewsController extends Controller
             'category' => 'nullable|string|max:100',
             'author' => 'nullable|string|max:100',
             'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'is_featured' => 'nullable|boolean'
+            'is_featured' => 'nullable|boolean',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         $imagePath = null;
@@ -71,6 +73,24 @@ class NewsController extends Controller
             'user_id' => Auth::id()
         ]);
 
+        // Simpan foto-foto tambahan ke galeri
+        if ($request->hasFile('gallery_images')) {
+            foreach ($request->file('gallery_images') as $index => $gFile) {
+                $gFileName = Str::random(20) . '.' . $gFile->getClientOriginalExtension();
+                $gPath = $gFile->storeAs('gallery', $gFileName, 'public');
+
+                Gallery::create([
+                    'title' => $news->title . ' - Foto ' . ($index + 1),
+                    'description' => 'Foto dari berita: ' . $news->title,
+                    'category' => $news->category ?: 'Berita',
+                    'image' => Storage::url($gPath),
+                    'is_featured' => false,
+                    'user_id' => Auth::id(),
+                    'news_id' => $news->id,
+                ]);
+            }
+        }
+
         return redirect()->route('admin.news.index')
                         ->with('success', 'Berita berhasil ditambahkan.');
     }
@@ -81,7 +101,7 @@ class NewsController extends Controller
     public function show(News $news)
     {
         return Inertia::render('Admin/News/Show', [
-            'news' => $news->load('user')
+            'news' => $news->load(['user', 'galleries'])
         ]);
     }
 
@@ -91,7 +111,7 @@ class NewsController extends Controller
     public function edit(News $news)
     {
         return Inertia::render('Admin/News/Edit', [
-            'news' => $news
+            'news' => $news->load('galleries')
         ]);
     }
 
@@ -108,7 +128,10 @@ class NewsController extends Controller
             'category' => 'nullable|string|max:100',
             'author' => 'nullable|string|max:100',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'is_featured' => 'nullable|boolean'
+            'is_featured' => 'nullable|boolean',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'removed_gallery_ids' => 'nullable|array',
+            'removed_gallery_ids.*' => 'integer|exists:galleries,id',
         ]);
 
         $data = [
@@ -139,6 +162,44 @@ class NewsController extends Controller
 
         $news->update($data);
 
+        // Update kategori foto galeri terkait jika kategori berita berubah
+        $news->galleries()->update([
+            'category' => $news->category ?: 'Berita'
+        ]);
+
+        // Hapus foto galeri yang diminta untuk dihapus
+        if ($request->filled('removed_gallery_ids')) {
+            $galleriesToDelete = Gallery::whereIn('id', $request->removed_gallery_ids)
+                ->where('news_id', $news->id)
+                ->get();
+
+            foreach ($galleriesToDelete as $gItem) {
+                if ($gItem->image && Storage::exists('public/' . str_replace('/storage/', '', $gItem->image))) {
+                    Storage::delete('public/' . str_replace('/storage/', '', $gItem->image));
+                }
+                $gItem->delete();
+            }
+        }
+
+        // Simpan foto-foto galeri baru
+        if ($request->hasFile('gallery_images')) {
+            $existingCount = $news->galleries()->count();
+            foreach ($request->file('gallery_images') as $index => $gFile) {
+                $gFileName = Str::random(20) . '.' . $gFile->getClientOriginalExtension();
+                $gPath = $gFile->storeAs('gallery', $gFileName, 'public');
+
+                Gallery::create([
+                    'title' => $news->title . ' - Foto ' . ($existingCount + $index + 1),
+                    'description' => 'Foto dari berita: ' . $news->title,
+                    'category' => $news->category ?: 'Berita',
+                    'image' => Storage::url($gPath),
+                    'is_featured' => false,
+                    'user_id' => Auth::id(),
+                    'news_id' => $news->id,
+                ]);
+            }
+        }
+
         return redirect()->route('admin.news.index')
                         ->with('success', 'Berita berhasil diperbarui.');
     }
@@ -148,12 +209,19 @@ class NewsController extends Controller
      */
     public function destroy(News $news)
     {
-        // Delete the image file
+        // Delete all associated gallery image files
+        foreach ($news->galleries as $galleryItem) {
+            if ($galleryItem->image && Storage::exists('public/' . str_replace('/storage/', '', $galleryItem->image))) {
+                Storage::delete('public/' . str_replace('/storage/', '', $galleryItem->image));
+            }
+        }
+
+        // Delete the main image file
         if ($news->image && Storage::exists('public/' . str_replace('/storage/', '', $news->image))) {
             Storage::delete('public/' . str_replace('/storage/', '', $news->image));
         }
 
-        // Delete the news entry
+        // Delete the news entry (cascade deletes gallery records in DB)
         $news->delete();
 
         return redirect()->route('admin.news.index')

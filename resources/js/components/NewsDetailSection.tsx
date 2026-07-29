@@ -10,6 +10,12 @@ interface User {
   email: string;
 }
 
+interface GalleryItem {
+  id: number;
+  image: string;
+  title?: string;
+}
+
 interface NewsItem {
   id: number;
   title: string;
@@ -23,6 +29,7 @@ interface NewsItem {
   created_at: string;
   updated_at: string;
   author: User;
+  galleries?: GalleryItem[];
 }
 
 interface NewsDetailSectionProps {
@@ -33,6 +40,7 @@ interface NewsDetailSectionProps {
 const NewsDetailSection: React.FC<NewsDetailSectionProps> = ({ news, relatedNews = [] }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
 
   // Format tanggal ke format Indonesia
   const formatDate = (dateString: string) => {
@@ -93,7 +101,8 @@ const NewsDetailSection: React.FC<NewsDetailSectionProps> = ({ news, relatedNews
                   <img
                     src={news.image}
                     alt={news.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover cursor-pointer hover:opacity-95 transition-opacity"
+                    onClick={() => setSelectedImage(news.image)}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.style.display = 'none';
@@ -143,9 +152,39 @@ const NewsDetailSection: React.FC<NewsDetailSectionProps> = ({ news, relatedNews
 
                 {/* Main Content */}
                 <div 
-                  className="prose max-w-none"
+                  className="prose max-w-none mb-8"
                   dangerouslySetInnerHTML={{ __html: news.content }}
                 />
+
+                {/* Galeri Foto Berita (Jika ada) */}
+                {news.galleries && news.galleries.length > 0 && (
+                  <div className="mt-8 pt-8 border-t border-gray-200">
+                    <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                      <span>Galeri Foto</span>
+                      <span className="text-sm font-normal text-gray-500">({news.galleries.length} foto)</span>
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {news.galleries.map((item) => (
+                        <div
+                          key={item.id}
+                          onClick={() => setSelectedImage(item.image)}
+                          className="group relative aspect-square rounded-xl overflow-hidden cursor-pointer border border-gray-200 bg-gray-100 shadow-sm hover:shadow-md transition-all duration-300"
+                        >
+                          <img
+                            src={item.image}
+                            alt={item.title || news.title}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="bg-white/90 text-gray-800 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">
+                              Lihat Foto
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Share Buttons */}
                 <div className="mt-8 pt-8 border-t border-gray-200">
@@ -291,6 +330,28 @@ const NewsDetailSection: React.FC<NewsDetailSectionProps> = ({ news, relatedNews
           </div>
         </div>
       </div>
+
+      {/* Lightbox Modal */}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl">
+            <img
+              src={selectedImage}
+              alt="Detail Foto"
+              className="w-full h-full object-contain max-h-[85vh] rounded-xl shadow-2xl"
+            />
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute top-3 right-3 bg-black/60 hover:bg-black text-white p-2 rounded-full text-sm transition-colors"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

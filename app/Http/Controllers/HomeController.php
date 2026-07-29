@@ -80,12 +80,12 @@ class HomeController extends Controller
     public function newsDetail($slug)
     {
         // Cari berita berdasarkan slug, jika tidak ditemukan coba berdasarkan ID
-        $news = News::with('author')
+        $news = News::with(['author', 'galleries'])
             ->where('slug', $slug)
             ->first();
 
         if (!$news && is_numeric($slug)) {
-            $news = News::with('author')->find($slug);
+            $news = News::with(['author', 'galleries'])->find($slug);
         }
 
         if (!$news) {

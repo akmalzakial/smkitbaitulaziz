@@ -8,6 +8,7 @@ const Create: React.FC = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
   const [isFeatured, setIsFeatured] = useState(false);
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -232,24 +233,47 @@ const Create: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
               {/* Kategori */}
               <div>
-                <label htmlFor="category" className="block text-xs font-bold uppercase text-slate-400 mb-2">
-                  Kategori <span className="text-slate-300 font-normal">(opsional)</span>
-                </label>
+                <div className="flex justify-between items-center mb-2">
+                  <label htmlFor="category" className="block text-xs font-bold uppercase text-slate-400">
+                    Kategori <span className="text-slate-300 font-normal">(opsional)</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsCustomCategory(!isCustomCategory);
+                      setCategory('');
+                    }}
+                    className="text-xs font-semibold text-orange-500 hover:text-orange-700 transition-colors"
+                  >
+                    {isCustomCategory ? 'Pilih dari Daftar' : '+ Kategori Baru'}
+                  </button>
+                </div>
                 <div className="relative flex flex-wrap items-stretch w-full transition-all rounded-lg ease">
                   <span className="text-sm ease absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-3 text-center font-normal text-slate-500 transition-all leading-5">
                     <i className="fas fa-folder" />
                   </span>
-                  <select
-                    id="category"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="text-sm w-full rounded-lg border border-solid border-gray-300 bg-white py-2 pr-3 pl-9 text-slate-700 focus:border-orange-500 focus:outline-none focus:shadow-primary-outline transition-all"
-                  >
-                    <option value="">-- Pilih Kategori --</option>
-                    {availableCategories.map((cat, index) => (
-                      <option key={index} value={cat}>{cat}</option>
-                    ))}
-                  </select>
+                  {isCustomCategory ? (
+                    <input
+                      type="text"
+                      id="category"
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      placeholder="Masukkan kategori baru"
+                      className="text-sm w-full rounded-lg border border-solid border-gray-300 bg-white py-2 pr-3 pl-9 text-slate-700 focus:border-orange-500 focus:outline-none focus:shadow-primary-outline transition-all"
+                    />
+                  ) : (
+                    <select
+                      id="category"
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      className="text-sm w-full rounded-lg border border-solid border-gray-300 bg-white py-2 pr-3 pl-9 text-slate-700 focus:border-orange-500 focus:outline-none focus:shadow-primary-outline transition-all"
+                    >
+                      <option value="">-- Pilih Kategori --</option>
+                      {availableCategories.map((cat, index) => (
+                        <option key={index} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               </div>
 

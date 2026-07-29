@@ -10,6 +10,7 @@ const Create: React.FC = () => {
     const [summary, setSummary] = useState('');
     const [content, setContent] = useState('');
     const [category, setCategory] = useState('');
+    const [isCustomCategory, setIsCustomCategory] = useState(false);
     const [author, setAuthor] = useState('');
     const [isFeatured, setIsFeatured] = useState(false);
     const [image, setImage] = useState<File | null>(null);
@@ -107,6 +108,39 @@ const Create: React.FC = () => {
         return Object.keys(newErrors).length === 0;
     };
 
+    const [galleryImages, setGalleryImages] = useState<File[]>([]);
+    const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
+    const galleryInputRef = useRef<HTMLInputElement>(null);
+
+    // Menangani penambahan foto galeri
+    const handleGalleryImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const filesArray = Array.from(e.target.files);
+            const updatedFiles = [...galleryImages, ...filesArray];
+            setGalleryImages(updatedFiles);
+
+            const newPreviews = [...galleryPreviews];
+            let readCount = 0;
+            filesArray.forEach((file) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    newPreviews.push(reader.result as string);
+                    readCount++;
+                    if (readCount === filesArray.length) {
+                        setGalleryPreviews([...newPreviews]);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    };
+
+    // Menghapus foto dari galeri sementara
+    const removeGalleryImage = (index: number) => {
+        setGalleryImages(prev => prev.filter((_, i) => i !== index));
+        setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
+    };
+
     // Menangani submit form
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -133,6 +167,10 @@ const Create: React.FC = () => {
             formData.append('image', image);
         }
         formData.append('slug', slug);
+
+        galleryImages.forEach((file) => {
+            formData.append('gallery_images[]', file);
+        });
 
         router.post('/admin/news', formData, {
             onSuccess: () => {
@@ -301,28 +339,96 @@ const Create: React.FC = () => {
                             )}
                         </ArgonCard>
 
+                        {/* Galeri Foto Berita */}
+                        <ArgonCard title="Foto Galeri Berita">
+                            <p className="text-xs text-slate-400 mb-3">
+                                Foto tambahan yang akan otomatis masuk ke Galeri Sekolah.
+                            </p>
+                            <input
+                                type="file"
+                                ref={galleryInputRef}
+                                className="hidden"
+                                onChange={handleGalleryImagesChange}
+                                accept="image/jpeg,image/png,image/jpg,image/webp"
+                                multiple
+                            />
+                            
+                            <div className="grid grid-cols-3 gap-2 mb-3">
+                                {galleryPreviews.map((src, index) => (
+                                    <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200">
+                                        <img src={src} alt={`Galeri preview ${index + 1}`} className="w-full h-full object-cover" />
+                                        <button
+                                            type="button"
+                                            onClick={() => removeGalleryImage(index)}
+                                            className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full text-xs opacity-90 hover:opacity-100 transition-opacity"
+                                        >
+                                            <i className="fas fa-times" />
+                                        </button>
+                                    </div>
+                                ))}
+
+                                <button
+                                    type="button"
+                                    onClick={() => galleryInputRef.current?.click()}
+                                    className="aspect-square border-2 border-dashed border-gray-300 hover:border-orange-500 rounded-lg flex flex-col items-center justify-center text-slate-400 hover:text-orange-500 transition-colors bg-gray-50 hover:bg-orange-50/20"
+                                >
+                                    <i className="fas fa-plus text-base mb-1" />
+                                    <span className="text-[10px] font-bold uppercase">Tambah</span>
+                                </button>
+                            </div>
+
+                            {galleryImages.length > 0 && (
+                                <p className="text-xs text-slate-500 font-medium">
+                                    {galleryImages.length} foto galeri terpilih
+                                </p>
+                            )}
+                        </ArgonCard>
+
                         {/* Publishing Options */}
                         <ArgonCard title="Opsi Publikasi">
                             {/* Kategori */}
                             <div className="mb-4">
-                                <label htmlFor="category" className="block text-xs font-bold uppercase text-slate-400 mb-2">
-                                    Kategori
-                                </label>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label htmlFor="category" className="block text-xs font-bold uppercase text-slate-400">
+                                        Kategori
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setIsCustomCategory(!isCustomCategory);
+                                            setCategory('');
+                                        }}
+                                        className="text-xs font-semibold text-orange-500 hover:text-orange-700 transition-colors"
+                                    >
+                                        {isCustomCategory ? 'Pilih dari Daftar' : '+ Kategori Baru'}
+                                    </button>
+                                </div>
                                 <div className="relative flex flex-wrap items-stretch w-full transition-all rounded-lg ease">
                                     <span className="text-sm ease absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-3 text-center font-normal text-slate-500 transition-all leading-5">
                                         <i className="fas fa-folder" />
                                     </span>
-                                    <select
-                                        id="category"
-                                        value={category}
-                                        onChange={(e) => setCategory(e.target.value)}
-                                        className="text-sm w-full rounded-lg border border-solid border-gray-300 bg-white py-2 pr-3 pl-9 text-slate-700 focus:border-orange-500 focus:outline-none focus:shadow-primary-outline transition-all"
-                                    >
-                                        <option value="">-- Pilih Kategori --</option>
-                                        {availableCategories.map((cat, index) => (
-                                            <option key={index} value={cat}>{cat}</option>
-                                        ))}
-                                    </select>
+                                    {isCustomCategory ? (
+                                        <input
+                                            type="text"
+                                            id="category"
+                                            value={category}
+                                            onChange={(e) => setCategory(e.target.value)}
+                                            placeholder="Masukkan kategori baru"
+                                            className="text-sm w-full rounded-lg border border-solid border-gray-300 bg-white py-2 pr-3 pl-9 text-slate-700 focus:border-orange-500 focus:outline-none focus:shadow-primary-outline transition-all"
+                                        />
+                                    ) : (
+                                        <select
+                                            id="category"
+                                            value={category}
+                                            onChange={(e) => setCategory(e.target.value)}
+                                            className="text-sm w-full rounded-lg border border-solid border-gray-300 bg-white py-2 pr-3 pl-9 text-slate-700 focus:border-orange-500 focus:outline-none focus:shadow-primary-outline transition-all"
+                                        >
+                                            <option value="">-- Pilih Kategori --</option>
+                                            {availableCategories.map((cat, index) => (
+                                                <option key={index} value={cat}>{cat}</option>
+                                            ))}
+                                        </select>
+                                    )}
                                 </div>
                             </div>
 

@@ -107,7 +107,10 @@ const Show: React.FC<Props> = ({ gallery }) => {
                 className="w-full object-contain max-h-[460px] rounded-lg shadow-sm"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
-                  e.currentTarget.nextElementSibling!.style.display = 'flex';
+                  const nextEl = e.currentTarget.nextElementSibling as HTMLElement;
+                  if (nextEl) {
+                    nextEl.style.display = 'flex';
+                  }
                 }}
               />
             ) : null}

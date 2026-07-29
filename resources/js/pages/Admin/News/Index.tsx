@@ -37,7 +37,7 @@ const Index: React.FC<Props> = ({ news }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [newsToDelete, setNewsToDelete] = useState<number | null>(null);
+  const [newsToDelete, setNewsToDelete] = useState<News | null>(null);
 
   // Mendapatkan kategori unik dari data berita
   const categories = ['all', ...new Set(news.map(item => item.category).filter((c): c is string => Boolean(c)))];
@@ -53,14 +53,14 @@ const Index: React.FC<Props> = ({ news }) => {
   });
 
   // Menangani proses penghapusan
-  const confirmDelete = (id: number) => {
-    setNewsToDelete(id);
+  const confirmDelete = (item: News) => {
+    setNewsToDelete(item);
     setShowDeleteModal(true);
   };
 
   const handleDelete = () => {
     if (newsToDelete) {
-      router.delete(`/admin/news/${newsToDelete}`, {
+      router.delete(`/admin/news/${newsToDelete.slug}`, {
         onSuccess: () => {
           setShowDeleteModal(false);
           setNewsToDelete(null);
@@ -156,7 +156,10 @@ const Index: React.FC<Props> = ({ news }) => {
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           e.currentTarget.style.display = 'none';
-                          e.currentTarget.nextElementSibling!.style.display = 'flex';
+                          const nextEl = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (nextEl) {
+                            nextEl.style.display = 'flex';
+                          }
                         }}
                       />
                     ) : null}
@@ -240,7 +243,7 @@ const Index: React.FC<Props> = ({ news }) => {
                       <i className="fas fa-edit text-xs" />
                     </Link>
                     <button
-                      onClick={() => confirmDelete(item.id)}
+                      onClick={() => confirmDelete(item)}
                       className="inline-flex items-center justify-center w-8 h-8 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-lg transition-colors cursor-pointer"
                       title="Hapus"
                     >
@@ -271,7 +274,7 @@ const Index: React.FC<Props> = ({ news }) => {
           <>
             <button
               type="button"
-              className="inline-flex justify-center px-4 py-2 text-xs font-bold uppercase text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-md cursor-pointer transition-all duration-200"
+              className="inline-flex justify-center px-4 py-2 text-xs font-bold uppercase text-red-500 bg-red-600 hover:bg-red-700 rounded-lg shadow-md cursor-pointer transition-all duration-200"
               onClick={handleDelete}
             >
               Hapus

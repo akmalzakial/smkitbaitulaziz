@@ -5,6 +5,12 @@ import ImagePlaceholder from '@/components/ImagePlaceholder';
 import ArgonCard from '@/components/admin/ArgonCard';
 import ArgonBadge from '@/components/admin/ArgonBadge';
 
+interface GalleryItem {
+  id: number;
+  image: string;
+  title?: string;
+}
+
 interface User {
   id: number;
   name: string;
@@ -23,6 +29,7 @@ interface News {
   created_at: string;
   updated_at: string;
   user: User;
+  galleries?: GalleryItem[];
 }
 
 interface Props {
@@ -108,7 +115,8 @@ const Show: React.FC<Props> = ({ news }) => {
                 className="w-full object-contain max-h-[460px] rounded-lg shadow-sm"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
-                  e.currentTarget.nextElementSibling!.style.display = 'flex';
+                  const next = e.currentTarget.nextElementSibling as HTMLElement | null;
+                  if (next) next.style.display = 'flex';
                 }}
               />
               <ImagePlaceholder 
@@ -116,6 +124,27 @@ const Show: React.FC<Props> = ({ news }) => {
                 height="400px" 
                 className="hidden" 
               />
+            </div>
+          )}
+
+          {/* Galeri Foto Berita (Jika ada) */}
+          {news.galleries && news.galleries.length > 0 && (
+            <div className="mb-6 pb-6 border-b border-gray-150">
+              <h6 className="text-slate-700 font-bold mb-3 text-sm flex items-center gap-2">
+                <i className="fas fa-images text-orange-500" />
+                Galeri Foto ({news.galleries.length} Foto)
+              </h6>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {news.galleries.map((item) => (
+                  <div key={item.id} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+                    <img 
+                      src={item.image} 
+                      alt={item.title || news.title}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           
