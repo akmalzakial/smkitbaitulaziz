@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
         {{-- Inline script to ensure light mode is always applied --}}
         <script>
@@ -124,6 +125,10 @@
             <link href="{{ asset('css/argon/argon-dashboard-tailwind.min.css') }}" rel="stylesheet" />
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
         @endif
+
+        {{-- Google AdSense --}}
+        <meta name="google-adsense-account" content="ca-pub-3326237997392390">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3326237997392390" crossorigin="anonymous"></script>
 
         @routes
         @viteReactRefresh

@@ -72,7 +72,7 @@ class NewsController extends Controller
             'image' => $imagePath ? Storage::url($imagePath) : null,
             'is_featured' => $request->is_featured ? true : false,
             'user_id' => Auth::id(),
-            'created_at' => $request->created_at ? \Carbon\Carbon::parse($request->created_at) : now(),
+            'created_at' => $request->filled('created_at') ? \Carbon\Carbon::parse($request->created_at)->setTimeFrom(now()) : now(),
         ]);
 
         // Simpan foto-foto tambahan ke galeri
@@ -145,7 +145,9 @@ class NewsController extends Controller
             'category' => $request->category,
             'author' => $request->author,
             'is_featured' => $request->is_featured ? true : false,
-            'created_at' => $request->created_at ? \Carbon\Carbon::parse($request->created_at) : $news->created_at,
+            'created_at' => $request->filled('created_at') 
+                ? \Carbon\Carbon::parse($request->created_at)->setTimeFrom($news->created_at ?: now()) 
+                : $news->created_at,
         ];
 
         // Handle image update if provided
@@ -230,5 +232,26 @@ class NewsController extends Controller
 
         return redirect()->route('admin.news.index')
                         ->with('success', 'Berita berhasil dihapus.');
+    }
+
+    /**
+     * Upload image from TinyMCE editor for news content.
+     */
+    public function uploadImage(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+        ]);
+
+        if ($request->hasFile('file')) {
+            $fileName = Str::random(20) . '.' . $request->file('file')->getClientOriginalExtension();
+            $path = $request->file('file')->storeAs('news/content', $fileName, 'public');
+
+            return response()->json([
+                'location' => url(Storage::url($path))
+            ]);
+        }
+
+        return response()->json(['error' => 'Gagal mengunggah gambar'], 400);
     }
 }

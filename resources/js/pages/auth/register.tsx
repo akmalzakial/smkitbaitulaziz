@@ -1,4 +1,4 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
@@ -7,7 +7,6 @@ import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
 
 type RegisterForm = {
     name: string;
@@ -32,20 +31,26 @@ export default function Register() {
     };
 
     return (
-        <div className="min-h-screen bg-black text-white flex items-center justify-center px-4 py-12">
+        <div className="min-h-screen bg-slate-50 text-slate-800 flex items-center justify-center px-4 py-12 relative overflow-hidden">
             <Head title="Registrasi" />
             
-            <div className="w-full max-w-md bg-zinc-900/70 rounded-xl border border-zinc-800 shadow-2xl p-8">
+            {/* Background elements */}
+            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-orange-500/10 blur-[120px] rounded-full pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-amber-500/10 blur-[120px] rounded-full pointer-events-none"></div>
+
+            <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-xl p-8 relative z-10">
                 <div className="flex flex-col items-center mb-8">
-                    <img src="/assets/images/logo.png" alt="SMK IT Baitul Aziz" className="h-28 w-auto mb-4" />
-                    <h1 className="text-2xl font-bold">Daftar <span className="text-orange-500">Akun</span></h1>
-                    <p className="text-zinc-400 text-sm mt-2 text-center">Lengkapi data berikut untuk membuat akun baru dan melakukan pendaftaran SPMB</p>
+                    <Link href="/">
+                        <img src="/assets/images/logo.png" alt="SMK IT Baitul Aziz" className="h-24 w-auto mb-4 hover:scale-105 transition-transform" />
+                    </Link>
+                    <h1 className="text-2xl font-bold text-slate-900">Daftar <span className="text-orange-500">Akun</span></h1>
+                    <p className="text-slate-500 text-sm mt-1.5 text-center">Lengkapi data berikut untuk membuat akun baru dan melakukan pendaftaran SPMB</p>
                 </div>
                 
-                <form className="flex flex-col gap-6" onSubmit={submit}>
-                    <div className="grid gap-6">
+                <form className="flex flex-col gap-5" onSubmit={submit}>
+                    <div className="grid gap-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="name" className="text-zinc-300">Nama Lengkap</Label>
+                            <Label htmlFor="name" className="text-slate-700 font-medium">Nama Lengkap</Label>
                             <Input
                                 id="name"
                                 type="text"
@@ -57,13 +62,13 @@ export default function Register() {
                                 onChange={(e) => setData('name', e.target.value)}
                                 disabled={processing}
                                 placeholder="Nama lengkap"
-                                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-orange-500 focus:ring-orange-500"
+                                className="bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-orange-500 focus:ring-orange-500 focus:bg-white"
                             />
-                            <InputError message={errors.name} className="mt-2" />
+                            <InputError message={errors.name} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="email" className="text-zinc-300">Alamat Email</Label>
+                            <Label htmlFor="email" className="text-slate-700 font-medium">Alamat Email</Label>
                             <Input
                                 id="email"
                                 type="email"
@@ -74,13 +79,13 @@ export default function Register() {
                                 onChange={(e) => setData('email', e.target.value)}
                                 disabled={processing}
                                 placeholder="email@example.com"
-                                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-orange-500 focus:ring-orange-500"
+                                className="bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-orange-500 focus:ring-orange-500 focus:bg-white"
                             />
                             <InputError message={errors.email} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password" className="text-zinc-300">Password</Label>
+                            <Label htmlFor="password" className="text-slate-700 font-medium">Password</Label>
                             <Input
                                 id="password"
                                 type="password"
@@ -91,13 +96,13 @@ export default function Register() {
                                 onChange={(e) => setData('password', e.target.value)}
                                 disabled={processing}
                                 placeholder="Password"
-                                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-orange-500 focus:ring-orange-500"
+                                className="bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-orange-500 focus:ring-orange-500 focus:bg-white"
                             />
                             <InputError message={errors.password} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation" className="text-zinc-300">Konfirmasi Password</Label>
+                            <Label htmlFor="password_confirmation" className="text-slate-700 font-medium">Konfirmasi Password</Label>
                             <Input
                                 id="password_confirmation"
                                 type="password"
@@ -108,14 +113,14 @@ export default function Register() {
                                 onChange={(e) => setData('password_confirmation', e.target.value)}
                                 disabled={processing}
                                 placeholder="Konfirmasi password"
-                                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-orange-500 focus:ring-orange-500"
+                                className="bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-orange-500 focus:ring-orange-500 focus:bg-white"
                             />
                             <InputError message={errors.password_confirmation} />
                         </div>
 
                         <Button 
                             type="submit" 
-                            className="mt-2 w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white" 
+                            className="mt-3 w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-md shadow-orange-500/20 font-semibold py-2.5 rounded-lg transition-all" 
                             tabIndex={5} 
                             disabled={processing}
                         >
@@ -124,9 +129,9 @@ export default function Register() {
                         </Button>
                     </div>
 
-                    <div className="text-center text-sm text-zinc-400">
+                    <div className="text-center text-sm text-slate-500 mt-2">
                         Sudah punya akun?{' '}
-                        <TextLink href={route('login')} className="text-orange-500 hover:text-orange-400" tabIndex={6}>
+                        <TextLink href={route('login')} className="text-orange-600 hover:text-orange-700 font-semibold" tabIndex={6}>
                             Login di sini
                         </TextLink>
                     </div>

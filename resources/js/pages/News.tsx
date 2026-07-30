@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useInView } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ImagePlaceholder from '../components/ImagePlaceholder';
+import { Eye } from 'lucide-react';
 
 // Interface untuk User
 interface User {
@@ -23,6 +24,7 @@ interface NewsItem {
   category: string | null;
   author_id: number;
   is_featured: boolean;
+  views_count?: number;
   created_at: string;
   updated_at: string;
   author: User;
@@ -95,6 +97,12 @@ const News: React.FC<NewsProps> = ({ news = [], categories = [], featured = null
     );
   }
   
+  // Helper function untuk membuang tag HTML dari content
+  const getPlainText = (htmlString: string | null | undefined): string => {
+    if (!htmlString) return '';
+    return htmlString.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim();
+  };
+
   // Helper function untuk kapitalisasi string
   function capitalize(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1).replace(/-/g, ' ');
@@ -248,12 +256,13 @@ const News: React.FC<NewsProps> = ({ news = [], categories = [], featured = null
                     )}
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">{featuredNews.title}</h2>
                     
-                    {featuredNews.summary && (
-                      <p className="text-gray-600 mb-6">{featuredNews.summary}</p>
-                    )}
+                    <p className="text-gray-600 mb-6 line-clamp-3">
+                      {getPlainText(featuredNews.content || featuredNews.summary)}
+                    </p>
                     
-                    <div className="flex items-center justify-between text-gray-500 text-sm mb-6">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-gray-500 text-sm mb-6">
                       <span>{formatDate(featuredNews.created_at)}</span>
+                      <span className="flex items-center gap-1.5"><Eye className="w-4 h-4 text-orange-500" /> {(featuredNews.views_count || 0).toLocaleString('id-ID')} dilihat</span>
                       <span>Oleh: {featuredNews.author.name}</span>
                     </div>
                     
@@ -357,14 +366,13 @@ const News: React.FC<NewsProps> = ({ news = [], categories = [], featured = null
                                 {item.title}
                               </h3>
                               
-                              {item.summary && (
-                                <p className="text-gray-600 line-clamp-3 mb-4 flex-grow">
-                                  {item.summary}
-                                </p>
-                              )}
+                              <p className="text-gray-600 line-clamp-3 mb-4 flex-grow text-sm">
+                                {getPlainText(item.content || item.summary)}
+                              </p>
                               
-                              <div className="flex items-center justify-between text-gray-500 text-xs mt-auto">
+                              <div className="flex items-center justify-between text-gray-500 text-xs mt-auto pt-2 border-t border-gray-100">
                                 <span>{formatDate(item.created_at)}</span>
+                                <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5 text-orange-500" /> {(item.views_count || 0).toLocaleString('id-ID')}</span>
                                 <span>Oleh: {item.author.name}</span>
                               </div>
                             </div>

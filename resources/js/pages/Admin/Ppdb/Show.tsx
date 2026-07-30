@@ -473,7 +473,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 // Component untuk menampilkan data item
 interface DataItemProps {
   label: string;
-  value: string | null;
+  value?: string | null;
   icon?: string;
   span?: string;
 }

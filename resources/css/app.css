@@ -159,17 +159,160 @@
     }
 }
 
-/* Responsive Prose Typography for Mobile */
+/* Responsive Prose Typography for Mobile & Desktop (TinyMCE Content Support) */
 .prose {
     font-size: 0.9375rem; /* 15px on mobile */
     line-height: 1.65;
+    color: #374151; /* text-gray-700 */
 }
 
-.prose h1 { font-size: 1.35rem; font-weight: 700; margin-top: 1.2em; margin-bottom: 0.5em; line-height: 1.3; }
-.prose h2 { font-size: 1.2rem; font-weight: 700; margin-top: 1.1em; margin-bottom: 0.4em; line-height: 1.35; }
-.prose h3 { font-size: 1.05rem; font-weight: 600; margin-top: 1em; margin-bottom: 0.4em; }
+.prose h1 { font-size: 1.35rem; font-weight: 700; color: #111827; margin-top: 1.2em; margin-bottom: 0.5em; line-height: 1.3; }
+.prose h2 { font-size: 1.2rem; font-weight: 700; color: #111827; margin-top: 1.1em; margin-bottom: 0.4em; line-height: 1.35; }
+.prose h3 { font-size: 1.05rem; font-weight: 600; color: #1f2937; margin-top: 1em; margin-bottom: 0.4em; }
+.prose h4 { font-size: 0.975rem; font-weight: 600; color: #1f2937; margin-top: 0.9em; margin-bottom: 0.3em; }
+
 .prose p { margin-top: 0.6em; margin-bottom: 0.6em; }
-.prose img { max-width: 100%; height: auto; border-radius: 0.75rem; margin-top: 1em; margin-bottom: 1em; }
+
+/* Lists (TinyMCE Bullet Points & Numbered Lists) */
+.prose ul {
+    list-style-type: disc !important;
+    padding-left: 1.5rem !important;
+    margin-top: 0.6em !important;
+    margin-bottom: 0.6em !important;
+}
+
+.prose ol {
+    list-style-type: decimal !important;
+    padding-left: 1.5rem !important;
+    margin-top: 0.6em !important;
+    margin-bottom: 0.6em !important;
+}
+
+.prose li {
+    margin-top: 0.25em !important;
+    margin-bottom: 0.25em !important;
+    padding-left: 0.25rem !important;
+}
+
+.prose ul ul {
+    list-style-type: circle !important;
+    margin-top: 0.25em !important;
+    margin-bottom: 0.25em !important;
+}
+
+.prose ol ol {
+    list-style-type: lower-alpha !important;
+    margin-top: 0.25em !important;
+    margin-bottom: 0.25em !important;
+}
+
+.prose ul ol, .prose ol ul {
+    margin-top: 0.25em !important;
+    margin-bottom: 0.25em !important;
+}
+
+/* Blockquotes */
+.prose blockquote {
+    font-style: italic;
+    color: #4b5563;
+    border-left: 4px solid #f97316;
+    padding-left: 1rem;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    background-color: #fff7ed;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+}
+
+/* Links */
+.prose a {
+    color: #ea580c;
+    text-decoration: underline;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.prose a:hover {
+    color: #c2410c;
+}
+
+/* Images & Media */
+.prose img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.75rem;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.prose figure {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.prose figcaption {
+    font-size: 0.85rem;
+    color: #6b7280;
+    text-align: center;
+    margin-top: 0.4em;
+}
+
+/* Tables */
+.prose table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    font-size: 0.875rem;
+}
+
+.prose th, .prose td {
+    border: 1px solid #e5e7eb;
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+}
+
+.prose th {
+    background-color: #f9fafb;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* Code & Pre */
+.prose pre {
+    background-color: #1f2937;
+    color: #f3f4f6;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.prose code {
+    background-color: #f3f4f6;
+    color: #ea580c;
+    padding: 0.15rem 0.35rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+}
+
+.prose pre code {
+    background-color: transparent;
+    color: inherit;
+    padding: 0;
+}
+
+/* Horizontal Rule */
+.prose hr {
+    border: 0;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+}
 
 @media (min-width: 640px) {
     .prose {
@@ -179,5 +322,6 @@
     .prose h1 { font-size: 1.875rem; }
     .prose h2 { font-size: 1.5rem; }
     .prose h3 { font-size: 1.25rem; }
+    .prose h4 { font-size: 1.1rem; }
     .prose p { margin-top: 0.8em; margin-bottom: 0.8em; }
 }

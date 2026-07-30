@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { motion, useInView } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -19,6 +19,9 @@ interface PpdbIndexProps {
 }
 
 export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbIndexProps) {
+  const { props } = usePage<{ auth?: { user?: any } }>();
+  const isLoggedIn = !!props.auth?.user;
+
   const heroRef = useRef(null);
   const isHeroInView = useInView(heroRef, { once: true });
 
@@ -137,7 +140,7 @@ export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbI
                   </Link>
                 ) : isOpen ? (
                   <Link
-                    href="/spmb/pendaftaran"
+                    href={isLoggedIn ? "/spmb/pendaftaran" : "/register"}
                     className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300 w-full sm:w-auto text-center"
                   >
                     Daftar Sekarang
@@ -443,7 +446,7 @@ export default function PpdbIndex({ hasRegistered = false, ppdbSettings }: PpdbI
                   </Link>
                 ) : isOpen ? (
                   <Link
-                    href="/spmb/pendaftaran"
+                    href={isLoggedIn ? "/spmb/pendaftaran" : "/register"}
                     className="px-6 py-3 bg-orange-500 hover:bg-orange-600 rounded-lg text-white font-medium transition-all duration-300"
                   >
                     Daftar Sekarang

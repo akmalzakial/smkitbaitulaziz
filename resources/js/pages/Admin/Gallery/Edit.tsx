@@ -275,9 +275,9 @@ const Edit: React.FC<Props> = ({ gallery }) => {
                   </button>
                 </div>
                 <div className="relative flex flex-wrap items-stretch w-full transition-all rounded-lg ease">
-                  <span className="text-sm ease absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-3 text-center font-normal text-slate-500 transition-all leading-5">
+                  {/* <span className="text-sm ease absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-3 text-center font-normal text-slate-500 transition-all leading-5">
                     <i className="fas fa-folder" />
-                  </span>
+                  </span> */}
                   {isCustomCategory ? (
                     <input
                       type="text"

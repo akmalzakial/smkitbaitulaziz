@@ -36,6 +36,8 @@ class News extends Model
         'author',
         'is_featured',
         'user_id',
+        'created_at',
+        'views_count',
     ];
 
     /**
@@ -45,6 +47,7 @@ class News extends Model
      */
     protected $casts = [
         'is_featured' => 'boolean',
+        'views_count' => 'integer',
     ];
 
     /**

@@ -38,8 +38,8 @@ class HomeController extends Controller
      */
     public function gallery()
     {
-        // Ambil semua data galeri
-        $galleries = Gallery::with('user')->latest()->get();
+        // Ambil semua data galeri beserta relasi user dan news
+        $galleries = Gallery::with(['user', 'news'])->latest()->get();
         
         // Ambil semua kategori unik
         $categories = Gallery::distinct()->pluck('category')->filter()->values();
@@ -90,6 +90,13 @@ class HomeController extends Controller
 
         if (!$news) {
             abort(404);
+        }
+
+        // Increment views count (menggunakan session agar penambahan view valid & efisien)
+        $sessionKey = 'viewed_news_' . $news->id;
+        if (!session()->has($sessionKey)) {
+            $news->increment('views_count');
+            session()->put($sessionKey, true);
         }
 
         // Ambil berita terkait berdasarkan kategori yang sama (maksimal 3)

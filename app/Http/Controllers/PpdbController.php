@@ -54,7 +54,7 @@ class PpdbController extends Controller
         
         // Cek apakah user sudah login
         if (!Auth::check()) {
-            return redirect()->route('login')->with('message', 'Silakan login terlebih dahulu untuk mendaftar PPDB');
+            return redirect()->route('register')->with('message', 'Silakan mendaftar akun terlebih dahulu untuk mendaftar SPMB');
         }
         
         // Cek apakah user sudah pernah mendaftar

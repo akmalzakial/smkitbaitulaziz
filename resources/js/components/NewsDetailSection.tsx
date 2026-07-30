@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link } from '@inertiajs/react';
 import { motion, useInView } from 'framer-motion';
-import { Calendar, User, Tag, Share2, Facebook, Twitter, Linkedin, Mail } from 'lucide-react';
+import { Calendar, User, Tag, Share2, Facebook, Twitter, Linkedin, Mail, Eye, Copy, Check } from 'lucide-react';
 import ImagePlaceholder from './ImagePlaceholder';
 
 interface User {
@@ -26,6 +26,7 @@ interface NewsItem {
   category: string | null;
   author_id: number;
   is_featured: boolean;
+  views_count?: number;
   created_at: string;
   updated_at: string;
   author: User;
@@ -38,7 +39,38 @@ interface NewsDetailSectionProps {
 }
 
 const NewsDetailSection: React.FC<NewsDetailSectionProps> = ({ news, relatedNews = [] }) => {
-  const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    const url = window.location.href;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(url).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2500);
+      }).catch(() => fallbackCopy(url));
+    } else {
+      fallbackCopy(url);
+    }
+  };
+
+  const fallbackCopy = (text: string) => {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch (err) {
+      console.error('Failed to copy link', err);
+    }
+    document.body.removeChild(textArea);
+  };
 
   // Format tanggal ke format Indonesia
   const formatDate = (dateString: string) => {
@@ -142,6 +174,10 @@ const NewsDetailSection: React.FC<NewsDetailSectionProps> = ({ news, relatedNews
                     <User className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1" />
                     <span>Oleh: <span className="text-orange-600 font-medium">{news.author.name}</span></span>
                   </div>
+                  <div className="flex items-center">
+                    <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 text-orange-500" />
+                    <span>Dilihat: <span className="font-semibold text-gray-900">{(news.views_count || 0).toLocaleString('id-ID')} kali</span></span>
+                  </div>
                 </div>
 
                 {/* Summary */}
@@ -189,48 +225,59 @@ const NewsDetailSection: React.FC<NewsDetailSectionProps> = ({ news, relatedNews
 
                 {/* Share Buttons */}
                 <div className="mt-8 pt-8 border-t border-gray-200">
-                  <div className="flex items-center gap-4">
-                    <Share2 className="h-5 w-5 text-gray-600" />
-                    <span className="text-gray-600">Bagikan:</span>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => shareNews('whatsapp')}
-                        className="p-2 rounded-full bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
-                        title="Bagikan di WhatsApp"
-                      >
-                        <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
-                          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => shareNews('facebook')}
-                        className="p-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-                        title="Bagikan di Facebook"
-                      >
-                        <Facebook className="h-4 w-4" />
-                      </button>
-                      {/* <button
-                        onClick={() => shareNews('twitter')}
-                        className="p-2 rounded-full bg-sky-500 text-white hover:bg-sky-600 transition-colors"
-                        title="Bagikan di Twitter"
-                      >
-                        <Twitter className="h-4 w-4" />
-                      </button> */}
-                      {/* <button
-                        onClick={() => shareNews('linkedin')}
-                        className="p-2 rounded-full bg-blue-700 text-white hover:bg-blue-800 transition-colors"
-                        title="Bagikan di LinkedIn"
-                      >
-                        <Linkedin className="h-4 w-4" />
-                      </button> */}
-                      <button
-                        onClick={() => shareNews('email')}
-                        className="p-2 rounded-full bg-gray-600 text-white hover:bg-gray-700 transition-colors"
-                        title="Bagikan melalui Email"
-                      >
-                        <Mail className="h-4 w-4" />
-                      </button>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <Share2 className="h-5 w-5 text-gray-600" />
+                      <span className="text-gray-700 font-medium text-sm">Bagikan:</span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => shareNews('whatsapp')}
+                          className="p-2 rounded-full bg-emerald-600 text-white hover:bg-emerald-700 transition-transform transform hover:scale-105"
+                          title="Bagikan di WhatsApp"
+                        >
+                          <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
+                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => shareNews('facebook')}
+                          className="p-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-transform transform hover:scale-105"
+                          title="Bagikan di Facebook"
+                        >
+                          <Facebook className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => shareNews('email')}
+                          className="p-2 rounded-full bg-gray-600 text-white hover:bg-gray-700 transition-transform transform hover:scale-105"
+                          title="Bagikan melalui Email"
+                        >
+                          <Mail className="h-4 w-4" />
+                        </button>
+                      </div>
                     </div>
+
+                    {/* Copy Link Button */}
+                    <button
+                      onClick={handleCopyLink}
+                      className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-sm transition-all duration-300 cursor-pointer self-start sm:self-auto ${
+                        copied
+                          ? 'bg-emerald-600 text-white ring-2 ring-emerald-200'
+                          : 'bg-orange-50 hover:bg-orange-100 text-orange-600 border border-orange-200 hover:border-orange-300'
+                      }`}
+                      title="Salin Tautan Berita"
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="h-3.5 w-3.5" />
+                          <span>Tautan Berhasil Disalin!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-3.5 w-3.5" />
+                          <span>Salin Tautan Berita</span>
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>

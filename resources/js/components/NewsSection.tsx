@@ -93,6 +93,12 @@ const NewsSection: React.FC<NewsSectionProps> = ({ latestNews = [] }) => {
     }
   };
 
+  // Helper function untuk membuang tag HTML dari content
+  const getPlainText = (htmlString: string | null | undefined): string => {
+    if (!htmlString) return '';
+    return htmlString.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim();
+  };
+
   // Format tanggal ke format Indonesia
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { 
@@ -179,7 +185,7 @@ const NewsSection: React.FC<NewsSectionProps> = ({ latestNews = [] }) => {
                   {news.title}
                 </h3>
                 <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                  {news.summary}
+                  {getPlainText(news.content || news.summary)}
                 </p>
                 <Link 
                   href={`/berita/${news.id}`} 

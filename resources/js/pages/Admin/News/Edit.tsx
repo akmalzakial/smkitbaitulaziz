@@ -37,6 +37,10 @@ const Edit: React.FC<Props> = ({ news }) => {
   const [isCustomCategory, setIsCustomCategory] = useState(false);
   const [author, setAuthor] = useState(news.author || '');
   const [createdAt, setCreatedAt] = useState(() => {
+    if (!news.created_at) return '';
+    if (typeof news.created_at === 'string') {
+      return news.created_at.split('T')[0].split(' ')[0];
+    }
     const d = new Date(news.created_at);
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -286,24 +290,99 @@ const Edit: React.FC<Props> = ({ news }) => {
                 </label>
                 <div className="rounded-xl overflow-hidden border border-gray-300 shadow-sm">
                   <Editor
-                    apiKey="us5k11n22fvccimhy645zjsiqgkl4l5du8597i653h7qqni0"
+                    apiKey="nubsbrxzaod5zwwrux6ox42mitdt3lhufqczh2in69u5mpbm"
                     onInit={(evt, editor) => {
                       editorRef.current = editor;
                     }}
                     initialValue={content}
                     init={{
                       height: 450,
-                      menubar: true,
+                      menubar: 'file edit view insert format tools table help',
+                      toolbar_mode: 'wrap',
+                      relative_urls: false,
+                      remove_script_host: false,
+                      convert_urls: true,
+                      document_base_url: typeof window !== 'undefined' ? window.location.origin + '/' : '',
                       plugins: [
-                        'advlist autolink lists link image charmap print preview anchor',
-                        'searchreplace visualblocks code fullscreen',
-                        'insertdatetime media table paste code help wordcount'
+                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'anchor',
+                        'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                        'insertdatetime', 'media', 'table', 'help', 'wordcount'
                       ],
-                      toolbar: 'undo redo | formatselect | ' +
+                      toolbar: 'undo redo | image media table | blocks formatselect | ' +
                         'bold italic backcolor | alignleft aligncenter ' +
                         'alignright alignjustify | bullist numlist outdent indent | ' +
                         'removeformat | help',
-                      content_style: 'body { font-family:Open Sans,system-ui,sans-serif; font-size:14px }'
+                      content_style: 'body { font-family:Open Sans,system-ui,sans-serif; font-size:14px } img { max-width: 100%; height: auto; border-radius: 8px; margin: 10px 0; display: block; }',
+                      automatic_uploads: true,
+                      images_upload_url: '/admin/news/upload-image',
+                      images_upload_handler: (blobInfo: any, progress: any) => new Promise((resolve, reject) => {
+                        const formData = new FormData();
+                        formData.append('file', blobInfo.blob(), blobInfo.filename());
+                        const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
+
+                        fetch('/admin/news/upload-image', {
+                          method: 'POST',
+                          headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                          },
+                          body: formData,
+                        })
+                        .then((response) => {
+                          if (!response.ok) {
+                            throw new Error('Gagal upload gambar (Status: ' + response.status + ')');
+                          }
+                          return response.json();
+                        })
+                        .then((json) => {
+                          if (json && json.location) {
+                            const finalUrl = json.location.startsWith('http')
+                              ? json.location
+                              : window.location.origin + (json.location.startsWith('/') ? json.location : '/' + json.location);
+                            resolve(finalUrl);
+                          } else {
+                            reject('Respon server tidak valid');
+                          }
+                        })
+                        .catch((err) => {
+                          reject('Upload gagal: ' + err.message);
+                        });
+                      }),
+                      file_picker_types: 'image',
+                      file_picker_callback: (cb: any, value: any, meta: any) => {
+                        if (meta.filetype === 'image') {
+                          const input = document.createElement('input');
+                          input.setAttribute('type', 'file');
+                          input.setAttribute('accept', 'image/*');
+                          input.onchange = function () {
+                            const file = (this as HTMLInputElement).files?.[0];
+                            if (file) {
+                              const formData = new FormData();
+                              formData.append('file', file, file.name);
+                              const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
+                              fetch('/admin/news/upload-image', {
+                                method: 'POST',
+                                headers: {
+                                  'X-CSRF-TOKEN': csrfToken,
+                                },
+                                body: formData,
+                              })
+                              .then(res => res.json())
+                              .then(json => {
+                                if (json && json.location) {
+                                  const finalUrl = json.location.startsWith('http')
+                                    ? json.location
+                                    : window.location.origin + (json.location.startsWith('/') ? json.location : '/' + json.location);
+                                  cb(finalUrl, { title: file.name, alt: file.name });
+                                }
+                              })
+                              .catch(err => {
+                                console.error('Upload failed', err);
+                              });
+                            }
+                          };
+                          input.click();
+                        }
+                      }
                     }}
                     onEditorChange={setContent}
                   />
@@ -462,9 +541,9 @@ const Edit: React.FC<Props> = ({ news }) => {
                   </button>
                 </div>
                 <div className="relative flex flex-wrap items-stretch w-full transition-all rounded-lg ease">
-                  <span className="text-sm ease absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-3 text-center font-normal text-slate-500 transition-all leading-5">
+                  {/* <span className="text-sm ease absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-3 text-center font-normal text-slate-500 transition-all leading-5">
                     <i className="fas fa-folder" />
-                  </span>
+                  </span> */}
                   {isCustomCategory ? (
                     <input
                       type="text"

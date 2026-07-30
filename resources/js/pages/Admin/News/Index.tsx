@@ -23,6 +23,7 @@ interface News {
   image: string;
   category: string | null;
   is_featured: boolean;
+  views_count?: number;
   user_id: number;
   created_at: string;
   updated_at: string;
@@ -137,6 +138,7 @@ const Index: React.FC<Props> = ({ news }) => {
             'Gambar',
             'Judul',
             { label: 'Kategori', align: 'left' },
+            { label: 'Dilihat', align: 'center' },
             { label: 'Unggulan', align: 'left' },
             { label: 'Penulis', align: 'left' },
             { label: 'Tanggal', align: 'left' },
@@ -194,6 +196,14 @@ const Index: React.FC<Props> = ({ news }) => {
                   ) : (
                     <span className="text-slate-400 text-xs">-</span>
                   )}
+                </td>
+
+                {/* Views Count */}
+                <td className="p-2 px-6 align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent text-center">
+                  <span className="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md">
+                    <i className="fas fa-eye text-orange-500 mr-1.5"></i>
+                    {(item.views_count || 0).toLocaleString('id-ID')}
+                  </span>
                 </td>
 
                 {/* Is Featured */}

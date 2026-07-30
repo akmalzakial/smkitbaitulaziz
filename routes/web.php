@@ -74,6 +74,7 @@ Route::prefix('admin')->middleware(['auth', AdminMiddleware::class])->group(func
     ]);
     
     // News Routes
+    Route::post('news/upload-image', [NewsController::class, 'uploadImage'])->name('admin.news.upload-image');
     Route::resource('news', NewsController::class)->names([
         'index' => 'admin.news.index',
         'create' => 'admin.news.create',
