@@ -21,6 +21,7 @@ interface News {
   author: string | null;
   slug: string;
   is_featured: boolean;
+  created_at: string;
   galleries?: GalleryItem[];
 }
 
@@ -35,6 +36,13 @@ const Edit: React.FC<Props> = ({ news }) => {
   const [category, setCategory] = useState(news.category || '');
   const [isCustomCategory, setIsCustomCategory] = useState(false);
   const [author, setAuthor] = useState(news.author || '');
+  const [createdAt, setCreatedAt] = useState(() => {
+    const d = new Date(news.created_at);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  });
   const [slug, setSlug] = useState(news.slug);
   const [isFeatured, setIsFeatured] = useState(news.is_featured);
   const [image, setImage] = useState<File | null>(null);
@@ -179,6 +187,9 @@ const Edit: React.FC<Props> = ({ news }) => {
     formData.append('content', content);
     formData.append('category', category);
     formData.append('author', author);
+    if (createdAt) {
+      formData.append('created_at', createdAt);
+    }
     formData.append('slug', slug);
     formData.append('is_featured', isFeatured ? '1' : '0');
     if (image) {
@@ -488,6 +499,17 @@ const Edit: React.FC<Props> = ({ news }) => {
                 onChange={(e) => setAuthor(e.target.value)}
                 placeholder="Nama penulis"
                 icon="fas fa-user"
+              />
+
+              {/* Tanggal Posting */}
+              <ArgonFormInput
+                label="Tanggal Posting"
+                type="date"
+                id="created_at"
+                value={createdAt}
+                onChange={(e) => setCreatedAt(e.target.value)}
+                icon="fas fa-calendar-alt"
+                required
               />
 
               {/* Unggulan */}

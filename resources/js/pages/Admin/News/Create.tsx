@@ -12,6 +12,13 @@ const Create: React.FC = () => {
     const [category, setCategory] = useState('');
     const [isCustomCategory, setIsCustomCategory] = useState(false);
     const [author, setAuthor] = useState('');
+    const [createdAt, setCreatedAt] = useState(() => {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    });
     const [isFeatured, setIsFeatured] = useState(false);
     const [image, setImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -162,6 +169,9 @@ const Create: React.FC = () => {
         formData.append('content', content);
         formData.append('category', category);
         formData.append('author', author);
+        if (createdAt) {
+            formData.append('created_at', createdAt);
+        }
         formData.append('is_featured', isFeatured ? '1' : '0');
         if (image) {
             formData.append('image', image);
@@ -441,6 +451,17 @@ const Create: React.FC = () => {
                                 onChange={(e) => setAuthor(e.target.value)}
                                 placeholder="Nama penulis"
                                 icon="fas fa-user"
+                            />
+
+                            {/* Tanggal Posting */}
+                            <ArgonFormInput
+                                label="Tanggal Posting"
+                                type="date"
+                                id="created_at"
+                                value={createdAt}
+                                onChange={(e) => setCreatedAt(e.target.value)}
+                                icon="fas fa-calendar-alt"
+                                required
                             />
 
                             {/* Unggulan */}

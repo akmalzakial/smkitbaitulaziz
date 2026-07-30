@@ -49,6 +49,7 @@ class NewsController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
             'is_featured' => 'nullable|boolean',
             'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'created_at' => 'nullable|date',
         ]);
 
         $imagePath = null;
@@ -70,7 +71,8 @@ class NewsController extends Controller
             'author' => $request->author,
             'image' => $imagePath ? Storage::url($imagePath) : null,
             'is_featured' => $request->is_featured ? true : false,
-            'user_id' => Auth::id()
+            'user_id' => Auth::id(),
+            'created_at' => $request->created_at ? \Carbon\Carbon::parse($request->created_at) : now(),
         ]);
 
         // Simpan foto-foto tambahan ke galeri
@@ -132,6 +134,7 @@ class NewsController extends Controller
             'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'removed_gallery_ids' => 'nullable|array',
             'removed_gallery_ids.*' => 'integer|exists:galleries,id',
+            'created_at' => 'nullable|date',
         ]);
 
         $data = [
@@ -142,6 +145,7 @@ class NewsController extends Controller
             'category' => $request->category,
             'author' => $request->author,
             'is_featured' => $request->is_featured ? true : false,
+            'created_at' => $request->created_at ? \Carbon\Carbon::parse($request->created_at) : $news->created_at,
         ];
 
         // Handle image update if provided

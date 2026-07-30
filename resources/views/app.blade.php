@@ -26,6 +26,88 @@
 
         <title inertia>{{ config('app.name', 'SMK IT Baitul Aziz') }}</title>
 
+        @php
+            $pageProps = $page['props'] ?? [];
+            $pageComponent = $page['component'] ?? '';
+
+            $siteName = config('app.name', 'SMK IT Baitul Aziz');
+            $ogTitle = $siteName;
+            $ogDescription = 'Website Resmi SMK IT Baitul Aziz - Sekolah Menengah Kejuruan Berbasis Teknologi dan Imtak';
+            $ogImage = asset('assets/images/logo.png');
+            $ogUrl = url()->current();
+            $ogType = 'website';
+
+            if ($pageComponent === 'NewsDetail' && !empty($pageProps['news'])) {
+                $item = $pageProps['news'];
+                if (is_array($item)) {
+                    $title = $item['title'] ?? '';
+                    if (!empty($title)) {
+                        $ogTitle = $title . ' - ' . $siteName;
+                    }
+                    
+                    $rawDesc = !empty($item['summary']) 
+                        ? $item['summary'] 
+                        : ($item['content'] ?? '');
+                    
+                    $cleanDesc = trim(preg_replace('/\s+/', ' ', strip_tags($rawDesc)));
+                    if (!empty($cleanDesc)) {
+                        $ogDescription = \Illuminate\Support\Str::limit($cleanDesc, 160);
+                    }
+                    
+                    if (!empty($item['image'])) {
+                        $img = $item['image'];
+                        $ogImage = \Illuminate\Support\Str::startsWith($img, ['http://', 'https://']) 
+                            ? $img 
+                            : url($img);
+                    }
+                    $ogType = 'article';
+                }
+            } elseif ($pageComponent === 'ExtracurricularDetail' && !empty($pageProps['extracurricular'])) {
+                $item = $pageProps['extracurricular'];
+                if (is_array($item)) {
+                    $name = $item['name'] ?? '';
+                    if (!empty($name)) {
+                        $ogTitle = $name . ' - ' . $siteName;
+                    }
+                    
+                    $rawDesc = $item['description'] ?? '';
+                    $cleanDesc = trim(preg_replace('/\s+/', ' ', strip_tags($rawDesc)));
+                    if (!empty($cleanDesc)) {
+                        $ogDescription = \Illuminate\Support\Str::limit($cleanDesc, 160);
+                    }
+                    
+                    if (!empty($item['image'])) {
+                        $img = $item['image'];
+                        $ogImage = \Illuminate\Support\Str::startsWith($img, ['http://', 'https://']) 
+                            ? $img 
+                            : url($img);
+                    }
+                    $ogType = 'article';
+                }
+            }
+        @endphp
+
+        <!-- Primary Meta Tags -->
+        <meta name="title" content="{{ $ogTitle }}">
+        <meta name="description" content="{{ $ogDescription }}">
+
+        <!-- Open Graph / Facebook / WhatsApp Meta Tags -->
+        <meta property="og:type" content="{{ $ogType }}">
+        <meta property="og:url" content="{{ $ogUrl }}">
+        <meta property="og:title" content="{{ $ogTitle }}">
+        <meta property="og:description" content="{{ $ogDescription }}">
+        <meta property="og:image" content="{{ $ogImage }}">
+        <meta property="og:image:secure_url" content="{{ $ogImage }}">
+        <meta property="og:image:alt" content="{{ $ogTitle }}">
+        <meta property="og:site_name" content="{{ $siteName }}">
+
+        <!-- Twitter Meta Tags -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:url" content="{{ $ogUrl }}">
+        <meta name="twitter:title" content="{{ $ogTitle }}">
+        <meta name="twitter:description" content="{{ $ogDescription }}">
+        <meta name="twitter:image" content="{{ $ogImage }}">
+
         {{-- Favicon --}}
         <link rel="icon" type="image/png" href="{{ asset('assets/images/logo.png') }}">
         <link rel="apple-touch-icon" href="{{ asset('assets/images/logo.png') }}">

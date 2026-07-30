@@ -34,15 +34,47 @@ interface NewsDetailProps {
 }
 
 const NewsDetail: React.FC<NewsDetailProps> = ({ news, relatedNews = [] }) => {
+  const newsTitle = `${news.title} - SMK IT Baitul Aziz`;
+  
+  const rawDesc = news.summary || news.content?.replace(/<[^>]+>/g, '') || '';
+  const newsDesc = rawDesc.trim().replace(/\s+/g, ' ').substring(0, 160);
+  
+  const newsImage = news.image
+    ? (news.image.startsWith('http://') || news.image.startsWith('https://'))
+      ? news.image
+      : `${typeof window !== 'undefined' ? window.location.origin : ''}${news.image.startsWith('/') ? '' : '/'}${news.image}`
+    : `${typeof window !== 'undefined' ? window.location.origin : ''}/assets/images/logo.png`;
+
+  const newsUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   return (
     <>
-      <Head title={`${news.title} - SMK IT Baitul Aziz`} />
+      <Head title={newsTitle}>
+        <meta name="description" content={newsDesc} />
+
+        {/* Open Graph / Facebook / WhatsApp */}
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={newsUrl} />
+        <meta property="og:title" content={newsTitle} />
+        <meta property="og:description" content={newsDesc} />
+        <meta property="og:image" content={newsImage} />
+        <meta property="og:image:secure_url" content={newsImage} />
+        <meta property="og:image:alt" content={news.title} />
+        <meta property="og:site_name" content="SMK IT Baitul Aziz" />
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={newsUrl} />
+        <meta name="twitter:title" content={newsTitle} />
+        <meta name="twitter:description" content={newsDesc} />
+        <meta name="twitter:image" content={newsImage} />
+      </Head>
       
       <div className="min-h-screen bg-white text-gray-800">
         <Navbar />
         
         {/* Hero Section */}
-        <section className="relative py-20 overflow-hidden">
+        <section className="relative pt-28 sm:pt-32 md:pt-36 pb-10 sm:pb-16 md:pb-20 overflow-hidden">
           {/* Background Elements */}
           <div className="absolute inset-0 bg-gray-50"></div>
           <div className="absolute inset-0 bg-[url('/images/circuit-pattern.svg')] opacity-10 bg-repeat"></div>
@@ -50,12 +82,12 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ news, relatedNews = [] }) => {
           <div className="absolute bottom-0 right-0 w-[30%] h-[30%] bg-orange-600/5 blur-[80px] rounded-full"></div>
           
           {/* Content */}
-          <div className="container mx-auto px-6 relative">
+          <div className="container mx-auto px-4 sm:px-6 relative">
             <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 text-gray-900 leading-tight">
                 {news.title}
               </h1>
-              <div className="flex flex-wrap items-center justify-center gap-4 text-gray-600">
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
                 <span>{new Date(news.created_at).toLocaleDateString('id-ID', {
                   day: 'numeric',
                   month: 'long',

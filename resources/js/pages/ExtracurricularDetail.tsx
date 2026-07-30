@@ -68,7 +68,7 @@ export default function ExtracurricularDetail({ extracurricular, otherExtracurri
           <div className="container mx-auto px-6 relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
-              animate={isHeroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               className="max-w-4xl mx-auto text-center"
             >
@@ -104,7 +104,7 @@ export default function ExtracurricularDetail({ extracurricular, otherExtracurri
               <div className="lg:col-span-2">
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
-                  animate={isContentInView ? { opacity: 1, y: 0 } : {}}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6 }}
                   className="bg-white shadow-md rounded-2xl overflow-hidden border border-gray-200"
                 >
@@ -194,7 +194,7 @@ export default function ExtracurricularDetail({ extracurricular, otherExtracurri
                 {/* Information Card */}
                 <motion.div 
                   initial={{ opacity: 0, x: 20 }}
-                  animate={isContentInView ? { opacity: 1, x: 0 } : {}}
+                  animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
                   className="bg-white shadow-md rounded-xl p-6 border border-gray-200"
                 >
@@ -250,7 +250,7 @@ export default function ExtracurricularDetail({ extracurricular, otherExtracurri
                 {otherExtracurriculars.length > 0 && (
                   <motion.div 
                     initial={{ opacity: 0, x: 20 }}
-                    animate={isContentInView ? { opacity: 1, x: 0 } : {}}
+                    animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.6, delay: 0.3 }}
                     className="bg-white shadow-md rounded-xl p-6 border border-gray-200"
                   >
@@ -303,7 +303,7 @@ export default function ExtracurricularDetail({ extracurricular, otherExtracurri
                 {/* CTA */}
                 <motion.div 
                   initial={{ opacity: 0, x: 20 }}
-                  animate={isContentInView ? { opacity: 1, x: 0 } : {}}
+                  animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: 0.4 }}
                   className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl p-6 border border-orange-200"
                 >
